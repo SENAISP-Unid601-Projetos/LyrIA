@@ -1,0 +1,17 @@
+
+projeto_lyrIA/
+│
+├── data/
+│   └── dialogs.json       # Banco de diálogos padrão
+│
+├── src/
+│   ├── __init__.py        # Arquivo vazio (torna src um pacote)
+│   ├── bot.py             # Versão básica (opcional)
+│   ├── ia.py              # Classe do chatbot com IA
+│   └── utils.py           # Funções auxiliares
+│
+├── tests/
+│   └── test_ia.py         # Testes do chatbot IA
+│
+├── requirements.txt       # Dependências
+└── main.py               # Ponto de entrada

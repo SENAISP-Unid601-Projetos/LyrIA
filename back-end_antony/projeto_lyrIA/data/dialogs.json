@@ -1,0 +1,11 @@
+{
+    "cumprimentos": ["Oi! Eu sou a LyrIA 😊", "Olá! Eu sou a LyrIA, como posso ajudar?", "E aí! LyrIA na área!"],
+    "despedidas": ["Até logo! Foi um prazer conversar! - LyrIA", "Tchau! Quando quiser conversar, estou aqui! - LyrIA"],
+    "palavras_chave": {
+        "tchau": "despedidas",
+        "adeus": "despedidas",
+        "oi": "cumprimentos",
+        "olá": "cumprimentos"
+    },
+    "padrao": "Desculpe, não entendi. Como posso ajudar?"
+}
