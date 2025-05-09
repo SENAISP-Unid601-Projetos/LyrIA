@@ -66,7 +66,7 @@ def gerar_prompt(conversas, memorias, nova_pergunta, persona):
     prompt += f"Usuário: {nova_pergunta}\nLyria:"
     return prompt
 
-def resumir_conversas(conversas, modelo='mistral'):
+def resumir_conversas(conversas, modelo='gemma3:1b'):
     texto = "\n".join([f"Usuário: {c['pergunta']}\nLyria: {c['resposta']}" for c in conversas])
     prompt = (
         "Resuma essa conversa em poucas frases, mantendo apenas as informações importantes e que devem ser lembradas:\n" +
@@ -80,7 +80,7 @@ def resumir_conversas(conversas, modelo='mistral'):
     response = requests.post('http://localhost:11434/api/generate', json=payload)
     return response.json()['response']
 
-def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='mistral'):
+def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:1b'):
     prompt_completo = gerar_prompt(conversas, memorias, pergunta, persona)
     payload = {
         'model': modelo,
