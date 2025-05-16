@@ -1,9 +1,7 @@
 import sqlite3
 
-# Nome do arquivo do banco de dados
 DB_NOME = "lyria.db"
 
-# Conecta e cria as tabelas, se ainda não existirem
 def criar_banco():
     conn = sqlite3.connect(DB_NOME)
     cursor = conn.cursor()
@@ -40,6 +38,5 @@ def criar_banco():
     conn.close()
     print("Banco de dados criado com sucesso!")
 
-# Executa a função ao rodar o script
 if __name__ == "__main__":
     criar_banco()
