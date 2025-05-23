@@ -6,11 +6,11 @@ from classificador_busca_web import deve_buscar_na_web
 LIMITE_HISTORICO = 20
 SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
 
-# Banco de dados
+#Banco de dados
 conn = sqlite3.connect("lyria.db")
 cursor = conn.cursor()
 
-# === Funções do banco ===
+#Funções do banco
 def carregar_memorias(usuario):
     cursor.execute("SELECT texto FROM memorias WHERE usuario = ?", (usuario,))
     return [linha[0] for linha in cursor.fetchall()]
@@ -34,7 +34,6 @@ def limpar_conversas(usuario):
 def salvar_resumo(usuario, resumo):
     salvar_memoria(usuario, resumo)
 
-# === Funções de linguagem ===
 def gerar_prompt(conversas, memorias, nova_pergunta, persona, contexto_web=None):
     prompt = persona + "\n"
 
@@ -61,7 +60,7 @@ def resumir_conversas(conversas, modelo='gemma3:1b'):
     response = requests.post('http://localhost:11434/api/generate', json=payload)
     return response.json()['response']
 
-def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:1b', contexto_web=None):
+def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:4b', contexto_web=None):
     prompt_completo = gerar_prompt(conversas, memorias, pergunta, persona, contexto_web)
     payload = {
         'model': modelo,
@@ -71,29 +70,31 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:1b',
     response = requests.post('http://localhost:11434/api/generate', json=payload)
     return response.json()['response']
 
-# === Pesquisa na Web com SerpAPI ===
 def buscar_na_web(pergunta):
-    url = "https://serpapi.com/search"
+    GOOGLE_API_KEY = "AIzaSyApiSVUy4VTda9hn5cj8MTxoEUJjzDOdIk"
+    GOOGLE_CSE_ID = "f565717fa7fde4d0f"
+
+    url = "https://www.googleapis.com/customsearch/v1"
     params = {
+        "key": GOOGLE_API_KEY,
+        "cx": GOOGLE_CSE_ID,
         "q": pergunta,
-        "hl": "pt-br",
-        "gl": "br",
-        "api_key": SERPAPI_KEY
+        "hl": "pt",      
+        "num": 2         
     }
     try:
         res = requests.get(url, params=params)
         data = res.json()
-        resultados = data.get("organic_results", [])
+        resultados = data.get("items", [])
         trechos = [item.get("snippet", "") for item in resultados if "snippet" in item]
-        return "\n".join(trechos[:3])  # pega até 3 snippets
+        return "\n".join(trechos[:3])
     except Exception as e:
         print(f"Erro na busca web: {e}")
         return None
 
-# === Execução ===
 entrada = input("Do que você precisa?\n1. Professor\n2. Empresa\nEscolha: ")
 if entrada == '1':
-    persona = 'Você é a professora Lyria...'
+    persona = 'Você é a professora Lyria, que tem o dever de responder seus aluno'
 elif entrada == '2':
     persona = 'Você é a Lyria, uma assistente virtual empresarial...'
 else:
