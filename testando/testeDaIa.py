@@ -41,7 +41,15 @@ def gerar_prompt(conversas, memorias, nova_pergunta, persona, contexto_web=None)
         prompt += "Informações importantes sobre o usuário:\n" + "\n".join(memorias) + "\n"
 
     if contexto_web:
-        prompt += "Informações da web:\n" + contexto_web + "\n"
+        prompt += (
+            "Aqui estão informações recentes da web que você deve usar para responder à pergunta:\n"
+            + contexto_web
+            + "\n"
+        )
+        prompt += (
+            "Baseie sua resposta principalmente nas informações da web acima, "
+            "sem inventar dados, e responda de forma clara e objetiva. Caso o que você \n"
+        )
 
     for troca in conversas:
         prompt += f"Usuário: {troca['pergunta']}\nLyria: {troca['resposta']}\n"
@@ -49,7 +57,7 @@ def gerar_prompt(conversas, memorias, nova_pergunta, persona, contexto_web=None)
     prompt += f"Usuário: {nova_pergunta}\nLyria:"
     return prompt
 
-def resumir_conversas(conversas, modelo='gemma3:1b'):
+def resumir_conversas(conversas, modelo='mistral:7b'):
     texto = "\n".join([f"Usuário: {c['pergunta']}\nLyria: {c['resposta']}" for c in conversas])
     prompt = "Resuma essa conversa em poucas frases, mantendo apenas as informações importantes e que devem ser lembradas:\n" + texto + "\nResumo:"
     payload = {
@@ -60,7 +68,7 @@ def resumir_conversas(conversas, modelo='gemma3:1b'):
     response = requests.post('http://localhost:11434/api/generate', json=payload)
     return response.json()['response']
 
-def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:4b', contexto_web=None):
+def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='mistral:7b', contexto_web=None):
     prompt_completo = gerar_prompt(conversas, memorias, pergunta, persona, contexto_web)
     payload = {
         'model': modelo,
@@ -71,32 +79,28 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, modelo='gemma3:4b',
     return response.json()['response']
 
 def buscar_na_web(pergunta):
-    GOOGLE_API_KEY = "AIzaSyApiSVUy4VTda9hn5cj8MTxoEUJjzDOdIk"
-    GOOGLE_CSE_ID = "f565717fa7fde4d0f"
-
-    url = "https://www.googleapis.com/customsearch/v1"
+    url = "https://serpapi.com/search"
     params = {
-        "key": GOOGLE_API_KEY,
-        "cx": GOOGLE_CSE_ID,
         "q": pergunta,
-        "hl": "pt",      
-        "num": 2         
+        "hl": "pt-br",
+        "gl": "br",
+        "api_key": SERPAPI_KEY
     }
     try:
         res = requests.get(url, params=params)
         data = res.json()
-        resultados = data.get("items", [])
+        resultados = data.get("organic_results", [])
         trechos = [item.get("snippet", "") for item in resultados if "snippet" in item]
-        return "\n".join(trechos[:3])
+        return "\n".join(trechos[:3]) 
     except Exception as e:
         print(f"Erro na busca web: {e}")
         return None
 
 entrada = input("Do que você precisa?\n1. Professor\n2. Empresa\nEscolha: ")
 if entrada == '1':
-    persona = 'Você é a professora Lyria, que tem o dever de responder seus aluno'
+    persona = 'Você é a professora Lyria, que tem o dever de responder seus alunos de forma empática, considerando o que eles falam e as buscas na web, além de não dar respostas muito longas, perguntando se eles querem saber mais. Use sempre as informações da web fornecidas para responder às perguntas. Caso elas contradigam seu conhecimento interno, prefira as informações da web para responder as perguntas pois serão informações mais atualizadas.'
 elif entrada == '2':
-    persona = 'Você é a Lyria, uma assistente virtual empresarial...'
+    persona = 'Você é a Lyria, uma assistente virtual empresarial, que é respeitosa, empática e responde de forma objetiva, considerando as pesquisas na web e o que seus usuários falam. Use sempre as informações da web fornecidas para responder às perguntas. Caso elas contradigam seu conhecimento interno, prefira as informações da web para responder as perguntas pois serão informações mais atualizadas.'
 else:
     print("Opção inválida.")
     exit()
