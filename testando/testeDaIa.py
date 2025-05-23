@@ -2,8 +2,9 @@ import requests
 import sqlite3
 import os
 from classificador_busca_web import deve_buscar_na_web
+import time
 
-LIMITE_HISTORICO = 20
+LIMITE_HISTORICO = 12
 SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
 
 #Banco de dados
@@ -118,12 +119,23 @@ while True:
     memorias = carregar_memorias(usuario)
 
     contexto_web = None
+    tempo_web = 0
     if deve_buscar_na_web(entrada):
         print("🔎 Pesquisando na web...")
+        inicio_web = time.time()
         contexto_web = buscar_na_web(entrada)
+        fim_web = time.time()
+        tempo_web = fim_web - inicio_web
 
+    inicio_ollama = time.time()
     resposta = perguntar_ollama(entrada, conversas, memorias, persona, contexto_web=contexto_web)
-    print("Lyria:", resposta)
+    fim_ollama = time.time()
+    tempo_ollama = fim_ollama - inicio_ollama
+
+    print(f"Lyria: {resposta}")
+    print(f"⏱️ Tempo de busca web: {tempo_web:.2f} segundos")
+    print(f"🧠 Tempo do modelo (Ollama): {tempo_ollama:.2f} segundos")
+    print(f"⏳ Tempo total de resposta: {tempo_web + tempo_ollama:.2f} segundos")
 
     salvar_conversa(usuario, entrada, resposta)
 
