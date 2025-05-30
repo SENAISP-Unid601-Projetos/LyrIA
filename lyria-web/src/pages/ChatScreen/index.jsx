@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import './Styles/styles.css';
+import { FaHome, FaPlus } from 'react-icons/fa';
+import { FiSun, FiMoon, FiUser } from 'react-icons/fi';
 
 function Chatbot() {
   const [messages, setMessages] = useState([
@@ -17,33 +19,34 @@ function Chatbot() {
     if (!input.trim()) return;
     setMessages([...messages, { sender: 'user', text: input }]);
     setInput('');
-    // Aqui você poderá integrar com backend IA futuramente
   };
 
   return (
     <div className="chatbot-container">
       <aside className="sidebar">
-        <h2>LyrIA</h2>
+        <h2> LyrIA</h2>
         <nav>
-          <button>Início</button>
-          <button>Novo chat</button>
+          <div><FaHome /><p>Início</p></div>
+          <div><FaPlus /><p>Novo chat</p></div>
         </nav>
-        <footer>
-          <button>Ajuda</button>
-          <button>Nova LyrIA após...</button>
-        </footer>
+        <div className="sidebar-footer">
+          <p>Hoje</p>
+          <hr />
+          <p>Nome LyrIA após...</p>
+        </div>
       </aside>
+      
       <main className="chat-area">
         <header className="chat-header">
           <div className="user-info">
-            <span className="user-icon">👤</span>
+            <FiUser className="user-icon" />
             <span>João Gabriel</span>
           </div>
           <div className="chat-actions">
-            <button>⚙️</button>
-            <button>📞</button>
+            <button><FiSun className="chat-actions-icon"/></button>
+            <button><FiMoon className="chat-actions-icon"/></button>
           </div>
-          <button className="share-btn">Compartilhar</button>
+          <button className="share-btn"><p>Compartilhar</p></button>
         </header>
         <div className="chat-body">
           {messages.map((msg, idx) => (
