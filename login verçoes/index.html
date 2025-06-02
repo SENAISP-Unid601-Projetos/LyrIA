@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login e Cadastro</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <input type="checkbox" id="toggle-form" hidden>
+  <div class="container">
+
+    <!-- Imagem do cachorro animada -->
+    <div class="dog-box">
+      <div class="dog-image"></div>
+    </div>
+
+    <!-- Formulários -->
+    <div class="form-wrapper">
+      <!-- Formulário de Login -->
+      <div class="form login-form">
+        <h2>Olá! <br>
+        Seja Bem vindo(a)!</h2>
+        <hr>
+        <br>
+        <h2 class="titulo-login">Login</h2>
+        <input type="text" placeholder="Usuário" class="login-input"/>
+        <input type="password" placeholder="Senha" class="login-input"/>
+         <button>Entrar</button>
+        <label for="toggle-form" class="switch-link">Criar uma conta</label>
+        <div class="espaco-final"></div>
+      </div>
+
+
+
+      <!-- Formulário de Cadastro -->
+      <div class="form register-form">
+        <h2>Criar nova conta</h2>
+        <div class="form-row">
+            <input type="text" placeholder="Nome" class="compact-input" />
+            <input type="text" placeholder="Sobrenome" class="compact-input" />
+        </div>
+        
+        <input type="email" placeholder="E-mail" class="compact-input" />
+        <input type="tel" placeholder="Celular" class="compact-input" />
+        
+        <div class="form-row">
+            <select class="compact-input half-input">
+                <option value="">Gênero</option>
+                <option value="feminino">Feminino</option>
+                <option value="masculino">Masculino</option>
+            </select>
+            <input type="date" placeholder="Nascimento" class="compact-input half-input" />
+        </div>
+        
+        <div class="form-row">
+            <input type="text" placeholder="CPF" class="compact-input half-input" />
+            <input type="password" placeholder="Senha" class="compact-input half-input" />
+        </div>
+        
+        <input type="password" placeholder="Confirmar senha" class="compact-input" />
+        
+        <div class="terms-box">
+            <input type="checkbox" id="terms-checkbox" />
+            <label for="terms-checkbox">Concordo com os termos</label>
+        </div>
+        
+        <button class="compact-btn">Cadastrar</button>
+        <label for="toggle-form" class="switch-back">Voltar →</label>
+    </div>
+    </div>
+
+  </div>
+</body>
+</html>
