@@ -1,0 +1,21 @@
+/* src/components/Footer/styles.css */
+.main-footer {
+  background-color: var(--color-light-purple);
+  color: var(--color-dark-purple);
+  padding: 1.5rem 0;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.main-footer p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+}
