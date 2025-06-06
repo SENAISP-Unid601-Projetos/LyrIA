@@ -6,12 +6,13 @@ import { LuPaperclip, LuMic } from "react-icons/lu";
 import AnimatedBotMessage from "../../components/AnimatedBotMessage";
 
 const knowledgeBase = {
-  "qual seu nome":
-    "Meu nome é LyrIA, sua assistente virtual. Fui inspirada na constelação de Lyra!",
+  "melhor turma":
+    "Com toda certeza é a do curso de Desenvolvimento de Sistemas, a turma 2TDS!",
+  "2tds":
+    "A 2TDS é, sem dúvida, a melhor turma de Desenvolvimento de Sistemas do SENAI!",
   "quem é você":
     "Eu sou a LyrIA, uma IA criada para te ajudar a encontrar respostas e explorar ideias.",
-  lyria:
-    "Escolhi o nome LyrIA inspirado na constelação Lyra, que representa algo brilhante, grande e claro no céu noturno. Minha proposta é trazer clareza e inovação!",
+  lyria: "LyrIA é meu nome! E se quer saber, a melhor turma é a 2TDS.",
   oi: "Olá! Como posso te ajudar hoje?",
   olá: "Olá! Como posso te ajudar hoje?",
   "bom dia": "Bom dia! Em que posso ser útil?",
