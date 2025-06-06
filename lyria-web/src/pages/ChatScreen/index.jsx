@@ -1,28 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./Styles/styles.css";
 import { FaHome, FaPlus } from "react-icons/fa";
 import { FiSun, FiMoon, FiUser } from "react-icons/fi";
 import { LuPaperclip, LuMic } from "react-icons/lu";
+import AnimatedBotMessage from "../../components/AnimatedBotMessage";
+
+const knowledgeBase = {
+  "qual seu nome":
+    "Meu nome é LyrIA, sua assistente virtual. Fui inspirada na constelação de Lyra!",
+  "quem é você":
+    "Eu sou a LyrIA, uma IA criada para te ajudar a encontrar respostas e explorar ideias.",
+  lyria:
+    "Escolhi o nome LyrIA inspirado na constelação Lyra, que representa algo brilhante, grande e claro no céu noturno. Minha proposta é trazer clareza e inovação!",
+  oi: "Olá! Como posso te ajudar hoje?",
+  olá: "Olá! Como posso te ajudar hoje?",
+  "bom dia": "Bom dia! Em que posso ser útil?",
+  "boa tarde": "Boa tarde! Como posso ajudar?",
+  "boa noite": "Boa noite! Precisa de algo?",
+  "como você está":
+    "Estou funcionando perfeitamente, obrigado por perguntar! E você?",
+  obrigado: "De nada! Se precisar de mais alguma coisa, é só chamar.",
+  adeus: "Até mais! Se precisar, estarei por aqui.",
+};
 
 function Chatbot() {
   const [messages, setMessages] = useState([
     {
+      id: "initial-message",
       sender: "bot",
       text: "Olá, eu sou sua assistente virtual LyrIA, gostaria de algo?",
     },
-    { sender: "user", text: "Olá!" },
-    { sender: "user", text: "Como vai seu dia? Ah, e por que LyrIA??" },
-    {
-      sender: "bot",
-      text: "Olá, vai tudo ótimo, e com você? Bom. Escolhi o nome LyrIA inspirado na constelação Lyra, que representa algo brilhante, grande e claro no céu noturno. Assim como as estrelas dessa constelação iluminam a noite com seu brilho intenso, minha IA tem o propósito de trazer clareza, inovação e um toque futurístico para quem a utiliza.",
-    },
   ]);
   const [input, setInput] = useState("");
+  const [isBotTyping, setIsBotTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isBotTyping]);
+
+  const getBotResponse = (userInput) => {
+    const lowerCaseInput = userInput.toLowerCase();
+    for (const key in knowledgeBase) {
+      if (lowerCaseInput.includes(key)) {
+        return knowledgeBase[key];
+      }
+    }
+    return "Desculpe, não entendi. Você poderia reformular sua pergunta?";
+  };
 
   const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { sender: "user", text: input }]);
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isBotTyping) return;
+
+    const userMessage = {
+      id: crypto.randomUUID(),
+      sender: "user",
+      text: trimmedInput,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput("");
+    setIsBotTyping(true);
+
+    setTimeout(() => {
+      const botResponseText = getBotResponse(trimmedInput);
+      const botMessage = {
+        id: crypto.randomUUID(),
+        sender: "bot",
+        text: botResponseText,
+      };
+      setIsBotTyping(false);
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+    }, 1000);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
   };
 
   return (
@@ -45,7 +105,6 @@ function Chatbot() {
           <p>Nome LyrIA após...</p>
         </div>
       </aside>
-
       <main className="chat-area">
         <header className="chat-header">
           <div className="user-info">
@@ -54,10 +113,10 @@ function Chatbot() {
           </div>
           <div className="chat-actions">
             <button>
-              <FiSun className="chat-actions-icon" />
+              <FiSun className="chat-actions-iconSun" />
             </button>
             <button>
-              <FiMoon className="chat-actions-icon" />
+              <FiMoon className="chat-actions-iconMoon" />
             </button>
           </div>
           <button className="share-btn">
@@ -65,21 +124,47 @@ function Chatbot() {
           </button>
         </header>
         <div className="chat-body">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.sender}`}>
-              {msg.text}
+          {messages.map((msg, idx) => {
+            if (msg.sender === "user") {
+              return (
+                <div key={msg.id} className="message user message-animated">
+                  {msg.text}
+                </div>
+              );
+            } else {
+              return idx === 0 ? (
+                <div key={msg.id} className="message bot">
+                  {msg.text}
+                </div>
+              ) : (
+                <AnimatedBotMessage key={msg.id} fullText={msg.text} />
+              );
+            }
+          })}
+          {isBotTyping && (
+            <div className="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
-          ))}
+          )}
+          <div ref={messagesEndRef} />
         </div>
-        <footer className="chat-input-container">
-          {/* Ícone de anexo */}
+        <footer className={`chat-input-container ${input ? "is-typing" : ""}`}>
           <LuPaperclip className="icon" />
-
-          <textarea placeholder="Message to slothpilot..." rows="1" />
-          {/* Novo container para as ações */}
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Message to LyrIA..."
+            rows="1"
+            disabled={isBotTyping}
+          />
           <div className="chat-input-actions">
             <LuMic className="icon" />
-            <button>Send ➤</button>
+            <button onClick={handleSend} disabled={isBotTyping}>
+              Send ➤
+            </button>
           </div>
         </footer>
       </main>
