@@ -38,7 +38,7 @@ function Header() {
           </a>
           
           <Link to="/chat">Chat</Link>
-          <Link to="/criteria">Critérios</Link>
+          <Link to="/RegistrationAndLogin">Entrar</Link>
         </nav>
       </div>
     </header>
