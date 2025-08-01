@@ -7,6 +7,7 @@ import './Styles/styles.css';
 // Por favor, ajuste o caminho se seus componentes estiverem em outra pasta!
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import { Link } from 'react-router-dom';
 
 function InitialScreen() {
   return (
@@ -32,13 +33,16 @@ function InitialScreen() {
               <h2 >MUDAMOS O MUNDO</h2>
               <h2>LYRIA</h2>
               <h3 id='effectword'>PARA UM NOVO MUNDO</h3>
-              
-              <button className="cta-button">
-                <span>COMEÇAR</span>
+              <Link to="/chat">
+              <button className="cta-button" >
+                <span>
+                  COMEÇAR
+                </span>
                 <div className="button-icon">
                   <ChatCircleDots size={22} weight="fill" />
                 </div>
               </button>
+              </Link>
             </div>
           </div>
         </div>
