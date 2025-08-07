@@ -1,64 +1,172 @@
-import { useState } from 'react';
-import './Styles/styles.css';
+import { useState, useEffect, useRef } from "react";
+import "./Styles/styles.css";
+import { FaHome, FaPlus } from "react-icons/fa";
+import { FiSun, FiMoon, FiUser } from "react-icons/fi";
+import { LuPaperclip, LuMic } from "react-icons/lu";
+import AnimatedBotMessage from "../../components/AnimatedBotMessage";
+
+const knowledgeBase = {
+  "melhor turma":
+    "Com toda certeza é a do curso de Desenvolvimento de Sistemas, a turma 2TDS!",
+  "2tds":
+    "A 2TDS é, sem dúvida, a melhor turma de Desenvolvimento de Sistemas do SENAI!",
+  "quem é você":
+    "Eu sou a LyrIA, uma IA criada para te ajudar a encontrar respostas e explorar ideias.",
+  lyria: "LyrIA é meu nome! E se quer saber, a melhor turma é a 2TDS.",
+  oi: "Olá! Como posso te ajudar hoje?",
+  olá: "Olá! Como posso te ajudar hoje?",
+  "bom dia": "Bom dia! Em que posso ser útil?",
+  "boa tarde": "Boa tarde! Como posso ajudar?",
+  "boa noite": "Boa noite! Precisa de algo?",
+  "como você está":
+    "Estou funcionando perfeitamente, obrigado por perguntar! E você?",
+  obrigado: "De nada! Se precisar de mais alguma coisa, é só chamar.",
+  adeus: "Até mais! Se precisar, estarei por aqui.",
+};
 
 function Chatbot() {
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Olá, eu sou sua assistente virtual LyrIA, gostaria de algo?' },
-    { sender: 'user', text: 'Olá!' },
-    { sender: 'user', text: 'Como vai seu dia? Ah, e por que LyrIA??' },
     {
-      sender: 'bot',
-      text: 'Olá, vai tudo ótimo, e com você? Bom. Escolhi o nome LyrIA inspirado na constelação Lyra, que representa algo brilhante, grande e claro no céu noturno. Assim como as estrelas dessa constelação iluminam a noite com seu brilho intenso, minha IA tem o propósito de trazer clareza, inovação e um toque futurístico para quem a utiliza.'
+      id: "initial-message",
+      sender: "bot",
+      text: "Olá, eu sou sua assistente virtual LyrIA, gostaria de algo?",
     },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+  const [isBotTyping, setIsBotTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isBotTyping]);
+
+  const getBotResponse = (userInput) => {
+    const lowerCaseInput = userInput.toLowerCase();
+    for (const key in knowledgeBase) {
+      if (lowerCaseInput.includes(key)) {
+        return knowledgeBase[key];
+      }
+    }
+    return "Desculpe, não entendi. Você poderia reformular sua pergunta?";
+  };
 
   const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { sender: 'user', text: input }]);
-    setInput('');
-    // Aqui você poderá integrar com backend IA futuramente
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isBotTyping) return;
+
+    const userMessage = {
+      id: crypto.randomUUID(),
+      sender: "user",
+      text: trimmedInput,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setInput("");
+    setIsBotTyping(true);
+
+    setTimeout(() => {
+      const botResponseText = getBotResponse(trimmedInput);
+      const botMessage = {
+        id: crypto.randomUUID(),
+        sender: "bot",
+        text: botResponseText,
+      };
+      setIsBotTyping(false);
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
+    }, 1000);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
   };
 
   return (
     <div className="chatbot-container">
       <aside className="sidebar">
-        <h2>LyrIA</h2>
+        <h2> LyrIA</h2>
         <nav>
-          <button>Início</button>
-          <button>Novo chat</button>
+          <div>
+            <FaHome />
+            <p>Início</p>
+          </div>
+          <div>
+            <FaPlus />
+            <p>Novo chat</p>
+          </div>
         </nav>
-        <footer>
-          <button>Ajuda</button>
-          <button>Nova LyrIA após...</button>
-        </footer>
+        <div className="sidebar-footer">
+          <p>Hoje</p>
+          <hr />
+          <p>Nome LyrIA após...</p>
+        </div>
       </aside>
       <main className="chat-area">
         <header className="chat-header">
           <div className="user-info">
-            <span className="user-icon">👤</span>
+            <FiUser className="user-icon" />
             <span>João Gabriel</span>
           </div>
           <div className="chat-actions">
-            <button>⚙️</button>
-            <button>📞</button>
+            <button>
+              <FiSun className="chat-actions-iconSun" />
+            </button>
+            <button>
+              <FiMoon className="chat-actions-iconMoon" />
+            </button>
           </div>
-          <button className="share-btn">Compartilhar</button>
+          <button className="share-btn">
+            <p>Compartilhar</p>
+          </button>
         </header>
         <div className="chat-body">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.sender}`}>
-              {msg.text}
+          {messages.map((msg, idx) => {
+            if (msg.sender === "user") {
+              return (
+                <div key={msg.id} className="message user message-animated">
+                  {msg.text}
+                </div>
+              );
+            } else {
+              return idx === 0 ? (
+                <div key={msg.id} className="message bot">
+                  {msg.text}
+                </div>
+              ) : (
+                <AnimatedBotMessage key={msg.id} fullText={msg.text} />
+              );
+            }
+          })}
+          {isBotTyping && (
+            <div className="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
-          ))}
+          )}
+          <div ref={messagesEndRef} />
         </div>
-        <footer className="chat-input">
+        <footer className={`chat-input-container ${input ? "is-typing" : ""}`}>
+          <LuPaperclip className="icon" />
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Message to LyrIA..."
+            rows="1"
+            disabled={isBotTyping}
           />
-          <button onClick={handleSend}>Send ➤</button>
+          <div className="chat-input-actions">
+            <LuMic className="icon" />
+            <button onClick={handleSend} disabled={isBotTyping}>
+              Send ➤
+            </button>
+          </div>
         </footer>
       </main>
     </div>
