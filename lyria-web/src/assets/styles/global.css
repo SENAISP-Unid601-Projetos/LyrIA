@@ -11,3 +11,8 @@
   --color-dark-purpleV2: #130F2F;
   --color-dark-black: #0D0D0D;
 }
+
+* {
+  margin: 0;
+  font-size: 18px;
+}

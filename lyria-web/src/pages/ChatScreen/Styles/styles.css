@@ -1,12 +1,7 @@
-* {
-  margin: 0;
-  font-size: 18px;
-  color: var(--color-white);
-}
-
 .chatbot-container {
   display: flex;
   height: 100vh;
+  color: var(--color-white);
 }
 
 .sidebar {
@@ -68,6 +63,8 @@
   border: 1px solid var(--color-white);
   border-radius: 100%;
   padding: 0.4rem;
+  color: var(--color-white);
+  font-size: 36px;
 }
 
 .chat-actions-iconMoon {
@@ -84,12 +81,23 @@
 
 .share-btn p {
   border: 1px solid var(--color-white);
+  color: var(--color-white);
   padding: 0.6rem;
   border-radius: 20px;
   font-size: 18px;
 }
 
-.chat-body {
+.share-btn{
+  transition: transform 0.2s ease-in-out;
+}
+
+#btnShare:hover,
+#btnShare:focus {
+  transform: scale(1.1); /* Mantém seu efeito de escala */
+  outline: none;         /* Remove o contorno azul SÓ nesses estados */
+}
+
+.chat-body {  
   flex: 1;
   padding: 1rem;
   display: flex;
@@ -156,10 +164,6 @@
   gap: 0.75rem;
 }
 
-.chat-input-actions .icon {
-  margin-top: 0;
-}
-
 .chat-input-container button {
   background-color: transparent;
   border: none;
@@ -168,6 +172,29 @@
   font-size: 1rem;
   font-weight: bold;
   padding: 0;
+  margin-top: 0;
+}
+
+#luPaperClipIcon {
+  font-size: 20px;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out; 
+}
+
+#luPaperClipIcon:hover {
+  opacity: 1;
+  transform: scale(1.15) rotate(-15deg);
+}
+
+#micIcon {
+  font-size: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out; 
+}
+
+#micIcon:hover,#btnSend:hover{
+  transform: scale(1.1); 
 }
 
 @keyframes fadeInSlideUp {

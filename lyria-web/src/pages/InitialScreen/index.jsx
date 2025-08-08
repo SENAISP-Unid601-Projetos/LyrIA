@@ -1,5 +1,3 @@
-// src/pages/InitialScreen/index.jsx
-import React from 'react';
 import { ChatCircleDots } from 'phosphor-react';
 import './Styles/styles.css';
 
