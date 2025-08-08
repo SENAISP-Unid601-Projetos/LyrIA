@@ -1,0 +1,7 @@
+requests
+pyttsx3
+SpeechRecognition
+pyaudio
+scikit-learn
+joblib
+python-dotenv
