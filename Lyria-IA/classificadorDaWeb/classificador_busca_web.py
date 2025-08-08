@@ -5,6 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import joblib
+import os
 
 def carregar_dados_csv(arquivo):
     perguntas = []
@@ -19,7 +20,12 @@ def carregar_dados_csv(arquivo):
     
     return perguntas, rotulos
 
-perguntas, rotulos = carregar_dados_csv('testando\dados.csv')
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+CAMINHO_CSV = os.path.join(BASE_DIR, "dados.csv")
+
+perguntas, rotulos = carregar_dados_csv(CAMINHO_CSV)
 
 random.shuffle(list(zip(perguntas, rotulos)))
 
