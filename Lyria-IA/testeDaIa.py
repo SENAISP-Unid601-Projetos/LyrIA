@@ -11,7 +11,7 @@ from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
 LIMITE_HISTORICO = 12
 SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
 OLLAMA_HOST = "http://localhost:11434"
-OLLAMA_MODEL = "mistral"
+OLLAMA_MODEL = "gemma3n:latest"
 ACTIVATION_WORDS = ["lyria", "olá", "oi", "alô"]
 
 # Inicializações
@@ -76,11 +76,14 @@ def ouvir_microfone():
             print(f"Erro áudio: {e}")
             return ""
 
-# Funções Ollama (mantidas)
 def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
     prompt = f"{persona}\nHistórico:\n"
     for msg in conversas[-LIMITE_HISTORICO:]:
         prompt += f"Usuário: {msg['pergunta']}\nLyria: {msg['resposta']}\n"
+    
+    if contexto_web:
+        prompt += f"Contexto de pesquisa na web, considere isso ACIMA dos dados que você tem pois estão mais atualizados, mesmo que sejam diferentes. Considere esse seguinte contexto para sua resposta: {contexto_web}\n"
+        
     prompt += f"Usuário: {pergunta}\nLyria:"
     
     try:
@@ -89,8 +92,11 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
             json={'model': OLLAMA_MODEL, 'prompt': prompt, 'stream': False},
             timeout=30
         )
-        return response.json().get('response', "Não entendi")
-    except Exception:
+        response.raise_for_status()
+        data = response.json()
+        return data.get('response', "Não entendi")
+    except requests.exceptions.RequestException as e:
+        print(f"Erro ao conectar ou receber resposta do Ollama: {e}")
         return "Erro de conexão"
 
 def buscar_na_web(pergunta):
