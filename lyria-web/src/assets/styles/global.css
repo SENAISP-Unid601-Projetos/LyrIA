@@ -3,6 +3,7 @@
 :root {
   font-family: "Montserrat", sans-serif;
 
+  /* Tema Escuro (padrão) */
   --color-white: #F6F4F1;
   --color-light-purple: #C9B6F2;
   --color-purpleV1: #6344A6;
@@ -10,8 +11,37 @@
   --color-dark-purple: #261A40;
   --color-dark-purpleV2: #130F2F;
   --color-dark-black: #0D0D0D;
+  
+  --text-on-purple: var(--color-white);
+  --icons-on-purple: var(--color-white);
+  --profile-text-color: var(--color-white);
+
+  --color-sharebtntext: var(--color-white);
+  --color-sharebtnbackground: none;
+  --color-sharebtnborder: var(--color-white);
+
+  --color-whitetext:#F6F4F1;
+ 
+  --color-chatinputclip: 
 }
 
+[data-theme="light"] {
+  /* Tema Claro - Modificações específicas */
+  --color-white: #261A40; /* Texto principal */
+  --color-dark-purple: #F6F4F1; /* Fundo do chat */
+  --color-dark-purpleV2: #6344A6; /* Fundo de elementos roxos */
+  --color-purpleV2: #6344A6; /* Fundo mensagens usuário */
+  
+  /* Novas variáveis para tema claro */
+  --profile-text-color: #000000; /* Nome do usuário preto */
+  --theme-icons-color: #000000; /* Ícones de sol/lua pretos */
+
+  --placeholder-color: #FFFFFF; /* Placeholder branco */
+
+  --color-sharebtntext: #F6F4F1;
+  --color-sharebtnbackground: #6344A6;
+  --color-sharebtnborder: none;
+}
 * {
   margin: 0;
   font-size: 18px;

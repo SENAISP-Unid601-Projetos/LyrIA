@@ -26,6 +26,7 @@ const knowledgeBase = {
 };
 
 function Chatbot() {
+  const [theme, setTheme] = useState('dark');
   const [messages, setMessages] = useState([
     {
       id: "initial-message",
@@ -36,6 +37,14 @@ function Chatbot() {
   const [input, setInput] = useState("");
   const [isBotTyping, setIsBotTyping] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+  };
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -118,11 +127,11 @@ function Chatbot() {
             <span>João Gabriel</span>
           </div>
           <div className="chat-actions">
-            <button>
-              <FiSun className="chat-actions-iconSun" />
+            <button onClick={toggleTheme}>
+              <FiSun className="chat-actions-iconSun" style={{ opacity: theme === 'light' ? 1 : 0.4 }} />
             </button>
-            <button>
-              <FiMoon className="chat-actions-iconMoon" />
+            <button onClick={toggleTheme}>
+              <FiMoon className="chat-actions-iconMoon" style={{ opacity: theme === 'dark' ? 1 : 0.4 }} />
             </button>
           </div>
           <button className="share-btn" id="btnShare">
