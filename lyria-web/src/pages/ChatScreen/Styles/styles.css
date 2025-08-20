@@ -1,17 +1,18 @@
 .chatbot-container {
   display: flex;
   height: 100vh;
-  color: var(--color-white);
+  background-color: var(--theme-background-page);
+  color: var(--theme-text-primary);
 }
 
 .sidebar {
   width: 220px;
-  background-color: var(--color-dark-purpleV2);
+  background-color: var(--theme-background-sidebar);
   display: flex;
   flex-direction: column;
   gap: 4rem;
   padding: 1rem;
-  color: var(--color-whitetext);
+  color: var(--theme-text-primary);
 }
 
 .sidebar nav {
@@ -40,9 +41,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-dark-purple);
+  background-color: var(--theme-background-page);
   padding: 0 2rem;
-  color: var(--color-whitetext);
+  color: var(--theme-text-primary);
 }
 
 .chat-header {
@@ -50,61 +51,61 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
+  background-color: var(--theme-background-header);
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color:var(--profile-text-color)
+  color: var(--theme-profile-text);
 }
 
-.user-icon,
-.chat-actions-iconSun,
-.chat-actions-iconMoon {
-  border: 1px solid var(--color-white);
+.user-icon {
+  border: 1px solid var(--theme-icon-primary);
   border-radius: 100%;
   padding: 0.4rem;
-  color: var(--color-white);
+  color: var(--theme-icon-primary);
   font-size: 36px;
 }
 
-.chat-input-actions .icon{
-  border: 1px solid #F6F4F1;
+.theme-toggle-btn {
+  background: none;
+  border: 1px solid var(--theme-icon-theme-toggler);
+  color: var(--theme-icon-theme-toggler);
   border-radius: 100%;
-  padding: 0.4rem;
-  color: var(--color-white);
-  font-size: 36px;
+  cursor: pointer;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
 }
 
-.chat-actions button,
 .share-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.1rem;
 }
 
 .share-btn p {
-  border: 1px solid var(--color-white);
-  background-color: var(--color-sharebtnbackground);
-  color: var(--color-sharebtntext);
+  border: 1px solid var(--theme-button-share-border);
+  background-color: var(--theme-button-share-background);
+  color: var(--theme-button-share-text);
   padding: 0.6rem;
   border-radius: 20px;
   font-size: 18px;
-}
-
-.share-btn {
   transition: transform 0.2s ease-in-out;
 }
 
-#btnShare:hover,
-#btnShare:focus {
+.share-btn:hover p,
+.share-btn:focus p {
   transform: scale(1.1);
   outline: none;
 }
 
-.chat-body {  
+.chat-body {
   flex: 1;
   padding: 1rem;
   display: flex;
@@ -119,15 +120,16 @@
   border-radius: 12px;
   line-height: 1.4;
   white-space: pre-line;
+  color: var(--theme-text-on-accent);
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: var(--color-dark-purpleV2);
+  background-color: var(--theme-background-message-bot);
 }
 
 .message.user {
-  background-color: var(--color-purpleV2);
+  background-color: var(--theme-background-message-user);
   align-self: flex-end;
 }
 
@@ -138,8 +140,8 @@
   gap: 0.75rem;
   margin: 1rem;
   padding: 0.75rem 1rem;
-  background-color: var(--color-dark-purpleV2);
-  border: 1px solid var(--color-white);
+  background-color: var(--theme-background-input-container);
+  border: 1px solid var(--theme-icon-primary);
   border-radius: 30px;
 }
 
@@ -149,15 +151,19 @@
   border: none;
   outline: none;
   resize: none;
-  color: var(--color-white);
+  color: var(--theme-text-primary);
   font-size: 1rem;
   line-height: 1;
   padding: 0.2rem 7rem 0.2rem 0.5rem;
-  min-height: 80px;
+  min-height: 40px;
+}
+
+.chat-input-container textarea::placeholder {
+  color: var(--theme-text-placeholder);
 }
 
 .chat-input-container .icon {
-  color: #F6F4F1;
+  color: var(--theme-icon-primary);
   font-size: 1.25rem;
   cursor: pointer;
   margin-top: 0.2rem;
@@ -175,7 +181,7 @@
 .chat-input-container button {
   background-color: transparent;
   border: none;
-  color:#F6F4F1;
+  color: var(--theme-text-primary);
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
@@ -187,7 +193,7 @@
   font-size: 20px;
   opacity: 0.4;
   cursor: pointer;
-  transition: all 0.3s ease-in-out; 
+  transition: all 0.3s ease-in-out;
 }
 
 #luPaperClipIcon:hover {
@@ -198,11 +204,12 @@
 #micIcon {
   font-size: 32px;
   cursor: pointer;
-  transition: all 0.3s ease-in-out; 
+  transition: all 0.3s ease-in-out;
 }
 
-#micIcon:hover,#btnSend:hover {
-  transform: scale(1.1); 
+#micIcon:hover,
+#btnSend:hover {
+  transform: scale(1.1);
 }
 
 @keyframes fadeInSlideUp {
@@ -232,7 +239,7 @@
   }
 }
 
-.chat-input-container.is-typing .chat-input-actions button {
+.chat-input-container.is-typing #btnSend {
   animation: pulse 1.5s infinite ease-in-out;
 }
 
@@ -252,7 +259,7 @@
   padding: 0.75rem 1rem;
   margin-left: 0.5rem;
   border-radius: 12px;
-  background-color: var(--color-dark-purpleV2);
+  background-color: var(--theme-background-message-bot);
 }
 
 .typing-indicator span {
@@ -260,7 +267,7 @@
   width: 8px;
   height: 8px;
   margin: 0 2px;
-  background-color: #a9a5b8;
+  background-color: var(--theme-text-secondary);
   border-radius: 50%;
   animation: bounce-dot 1.4s infinite ease-in-out both;
 }

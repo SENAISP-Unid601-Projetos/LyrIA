@@ -4,7 +4,7 @@ import { FaHome, FaPlus } from "react-icons/fa";
 import { FiSun, FiMoon, FiUser } from "react-icons/fi";
 import { LuPaperclip, LuMic } from "react-icons/lu";
 import AnimatedBotMessage from "../../components/AnimatedBotMessage";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 const knowledgeBase = {
   "melhor turma":
@@ -26,7 +26,7 @@ const knowledgeBase = {
 };
 
 function Chatbot() {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   const [messages, setMessages] = useState([
     {
       id: "initial-message",
@@ -39,11 +39,11 @@ function Chatbot() {
   const messagesEndRef = useRef(null);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
   };
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   const scrollToBottom = () => {
@@ -100,8 +100,8 @@ function Chatbot() {
     <div className="chatbot-container">
       <aside className="sidebar">
         <Link to="/">
-          <h2> LYRIA</h2>
-        </ Link>
+          <h2>LYRIA</h2>
+        </Link>
         <nav>
           <Link to="/">
             <div>
@@ -127,11 +127,9 @@ function Chatbot() {
             <span>João Gabriel</span>
           </div>
           <div className="chat-actions">
-            <button onClick={toggleTheme}>
-              <FiSun className="chat-actions-iconSun" style={{ opacity: theme === 'light' ? 1 : 0.4 }} />
-            </button>
-            <button onClick={toggleTheme}>
-              <FiMoon className="chat-actions-iconMoon" style={{ opacity: theme === 'dark' ? 1 : 0.4 }} />
+            {/* BOTÃO DE TEMA SIMPLIFICADO */}
+            <button onClick={toggleTheme} className="theme-toggle-btn">
+              {theme === "dark" ? <FiSun /> : <FiMoon />}
             </button>
           </div>
           <button className="share-btn" id="btnShare">
@@ -166,7 +164,7 @@ function Chatbot() {
           <div ref={messagesEndRef} />
         </div>
         <footer className={`chat-input-container ${input ? "is-typing" : ""}`}>
-          <LuPaperclip className="icon" id="luPaperClipIcon"/>
+          <LuPaperclip className="icon" id="luPaperClipIcon" />
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -176,7 +174,7 @@ function Chatbot() {
             disabled={isBotTyping}
           />
           <div className="chat-input-actions">
-            <LuMic className="icon" id="micIcon"/>
+            <LuMic className="icon" id="micIcon" />
             <button onClick={handleSend} disabled={isBotTyping} id="btnSend">
               Enviar ➤
             </button>
