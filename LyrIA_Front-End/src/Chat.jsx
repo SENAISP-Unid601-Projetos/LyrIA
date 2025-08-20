@@ -4,37 +4,67 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [started, setStarted] = useState(false);
+  // NOVO: Adiciona o estado para persona
+  const [persona, setPersona] = useState('default_persona');
   const messagesEndRef = useRef(null);
 
-  const sendMessage = (e) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-
     if (!started) setStarted(true);
 
-    const userMessage = { 
-      sender: 'user', 
+    // Adiciona a mensagem do usuário
+    const userMessage = {
+      sender: 'user',
       text: input,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    setTimeout(() => {
-      const botReply = { 
-        sender: 'bot', 
-        text: fakeAiReply(input),
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    // Envia a requisição para o back-end
+    try {
+      const response = await fetch('http://localhost:5000/Lyria/conversar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          usuario: 'user_default', // Substitua por um ID/nome de usuário dinâmico, se necessário
+          pergunta: input,
+          persona: persona, // NOVO: Usa o valor de persona do estado
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Adiciona a resposta do bot
+        const botReply = {
+          sender: 'bot',
+          text: data.resposta,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botReply]);
+      } else {
+        // Trata erros retornados pela API
+        const botReply = {
+          sender: 'bot',
+          text: `Erro: ${data.erro || 'Não foi possível obter a resposta.'}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages((prev) => [...prev, botReply]);
+      }
+    } catch (error) {
+      // Trata erros de conexão
+      const botReply = {
+        sender: 'bot',
+        text: 'Erro: Não foi possível conectar ao servidor.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, botReply]);
-    }, 600);
+    }
 
     setInput('');
-  };
-
-  const fakeAiReply = (question) => {
-    if (question.toLowerCase().includes('oi')) return 'Oi, tudo bem? 😊';
-    if (question.toLowerCase().includes('tempo')) return 'O tempo está ótimo para codar!';
-    return 'Desculpe, ainda estou aprendendo! 🤖';
   };
 
   useEffect(() => {
@@ -47,110 +77,118 @@ export default function Chat() {
     setMessages([]);
     setStarted(false);
     setInput('');
+    setPersona('default_persona'); // NOVO: Reseta a persona ao limpar o chat
   };
 
   if (!started) {
     return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        color: '#f5f5f5',
-        background: 'linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%)',
-      }}>
+      <div
+        style={{
+          height: '100vh',
+          display: 'flex',
+          color: '#f5f5f5',
+          background: 'linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%)',
+        }}
+      >
         {/* Sidebar FIXA (sempre visível) */}
-        <div style={{
-          width: '260px',
-          background: '#1a1a1a',
-          padding: '1rem',
-          borderRight: '1px solid #333',
-          overflowY: 'auto'
-        }}>
+        <div
+          style={{
+            width: '260px',
+            background: '#1a1a1a',
+            padding: '1rem',
+            borderRight: '1px solid #333',
+            overflowY: 'auto',
+          }}
+        >
           <div style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>deepseek</h2>
-            <button style={{
-              background: '#4caf50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '0.5rem 1rem',
-              width: '100%',
-              marginBottom: '2rem',
-              cursor: 'pointer'
-            }}>
+            <button
+              style={{
+                background: '#4caf50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '0.5rem 1rem',
+                width: '100%',
+                marginBottom: '2rem',
+                cursor: 'pointer',
+              }}
+              onClick={resetChat}
+            >
               New chat
             </button>
           </div>
-
           <div style={{ marginBottom: '2rem' }}>
             <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>Today</h3>
-            <div style={{ 
-              background: '#2a2a2a', 
-              padding: '0.75rem', 
-              borderRadius: '4px',
-              marginBottom: '0.5rem',
-              cursor: 'pointer'
-            }}>
+            <div
+              style={{
+                background: '#2a2a2a',
+                padding: '0.75rem',
+                borderRadius: '4px',
+                marginBottom: '0.5rem',
+                cursor: 'pointer',
+              }}
+            >
               Problema de layout no header...
             </div>
           </div>
-
           <div style={{ marginBottom: '2rem' }}>
             <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>30 Days</h3>
-            <div style={{ 
-              background: '#2a2a2a', 
-              padding: '0.75rem', 
-              borderRadius: '4px',
-              marginBottom: '0.5rem',
-              cursor: 'pointer'
-            }}>
+            <div
+              style={{
+                background: '#2a2a2a',
+                padding: '0.75rem',
+                borderRadius: '4px',
+                marginBottom: '0.5rem',
+                cursor: 'pointer',
+              }}
+            >
               Correção de consulta SQL para fun...
             </div>
           </div>
-
           <div style={{ marginBottom: '2rem' }}>
             <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>2025-03</h3>
-            <div style={{ 
-              background: '#2a2a2a', 
-              padding: '0.75rem', 
-              borderRadius: '4px',
-              marginBottom: '0.5rem',
-              cursor: 'pointer'
-            }}>
+            <div
+              style={{
+                background: '#2a2a2a',
+                padding: '0.75rem',
+                borderRadius: '4px',
+                marginBottom: '0.5rem',
+                cursor: 'pointer',
+              }}
+            >
               JavaScript: Captura e exibe número
             </div>
-            <div style={{ 
-              background: '#2a2a2a', 
-              padding: '0.75rem', 
-              borderRadius: '4px',
-              marginBottom: '0.5rem',
-              cursor: 'pointer'
-            }}>
+            <div
+              style={{
+                background: '#2a2a2a',
+                padding: '0.75rem',
+                borderRadius: '4px',
+                marginBottom: '0.5rem',
+                cursor: 'pointer',
+              }}
+            >
               IA para criar imagens sugeridas
             </div>
           </div>
-
-          <div style={{ 
-            position: 'absolute', 
-            bottom: '0', 
-            left: '0', 
-            width: '260px',
-            padding: '1rem',
-            borderTop: '1px solid #333'
-          }}>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: '0',
+              left: '0',
+              width: '260px',
+              padding: '1rem',
+              borderTop: '1px solid #333',
+            }}
+          >
             <div style={{ marginBottom: '1rem', cursor: 'pointer' }}>Get App (NEW)</div>
             <div style={{ cursor: 'pointer' }}>My Profile</div>
           </div>
         </div>
 
         {/* Conteúdo principal */}
-        <div style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-          overflow: 'hidden'
-        }}>
-          <header 
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+          <header
             style={{
               backgroundColor: '#1e1e1e',
               padding: '1.5rem',
@@ -166,38 +204,60 @@ export default function Chat() {
           >
             LyrIA Teste
           </header>
-
-          <div style={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '1rem',
-          }}>
-            <div style={{
-              background: '#2a2a2a',
-              padding: '3rem 2rem',
-              borderRadius: '16px',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-              width: 'min(90vw, 550px)',
-              textAlign: 'center',
-            }}>
-              <h1 style={{ 
-                fontSize: '2rem', 
-                margin: '0 auto 2rem auto',
-                background: 'linear-gradient(90deg, #4caf50, #2196f3)',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-                width: 'fit-content',
-              }}>
+          <div
+            style={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '1rem',
+            }}
+          >
+            <div
+              style={{
+                background: '#2a2a2a',
+                padding: '3rem 2rem',
+                borderRadius: '16px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+                width: 'min(90vw, 550px)',
+                textAlign: 'center',
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: '2rem',
+                  margin: '0 auto 2rem auto',
+                  background: 'linear-gradient(90deg, #4caf50, #2196f3)',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  width: 'fit-content',
+                }}
+              >
                 Como posso ajudar?
               </h1>
-              
-              <form onSubmit={sendMessage} style={{ 
-                width: '75%',
-                margin: '0 auto',
-              }}>
+              <form onSubmit={sendMessage} style={{ width: '75%', margin: '0 auto' }}>
+                {/* NOVO: Adiciona o seletor de persona */}
+                <select
+                  value={persona}
+                  onChange={(e) => setPersona(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '1rem',
+                    marginBottom: '1rem',
+                    borderRadius: '30px',
+                    border: 'none',
+                    backgroundColor: '#333',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)',
+                    outline: 'none',
+                  }}
+                >
+                  <option value="default_persona">Padrão</option>
+                  <option value="amigavel">Amigável</option>
+                  <option value="tecnico">Técnico</option>
+                </select>
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -223,106 +283,114 @@ export default function Chat() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      height: '100vh',
-      color: '#f5f5f5',
-      background: 'linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%)',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        height: '100vh',
+        color: '#f5f5f5',
+        background: 'linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%)',
+      }}
+    >
       {/* Sidebar FIXA (sempre visível) */}
-      <div style={{
-        width: '260px',
-        background: '#1a1a1a',
-        padding: '1rem',
-        borderRight: '1px solid #333',
-        overflowY: 'auto'
-      }}>
+      <div
+        style={{
+          width: '260px',
+          background: '#1a1a1a',
+          padding: '1rem',
+          borderRight: '1px solid #333',
+          overflowY: 'auto',
+        }}
+      >
         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>deepseek</h2>
-          <button style={{
-            background: '#4caf50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '0.5rem 1rem',
-            width: '100%',
-            marginBottom: '2rem',
-            cursor: 'pointer'
-          }}>
+          <button
+            style={{
+              background: '#4caf50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '0.5rem 1rem',
+              width: '100%',
+              marginBottom: '2rem',
+              cursor: 'pointer',
+            }}
+            onClick={resetChat}
+          >
             New chat
           </button>
         </div>
-
         <div style={{ marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>Today</h3>
-          <div style={{ 
-            background: '#2a2a2a', 
-            padding: '0.75rem', 
-            borderRadius: '4px',
-            marginBottom: '0.5rem',
-            cursor: 'pointer'
-          }}>
+          <div
+            style={{
+              background: '#2a2a2a',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
             Problema de layout no header...
           </div>
         </div>
-
         <div style={{ marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>30 Days</h3>
-          <div style={{ 
-            background: '#2a2a2a', 
-            padding: '0.75rem', 
-            borderRadius: '4px',
-            marginBottom: '0.5rem',
-            cursor: 'pointer'
-          }}>
+          <div
+            style={{
+              background: '#2a2a2a',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
             Correção de consulta SQL para fun...
           </div>
         </div>
-
         <div style={{ marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '0.5rem' }}>2025-03</h3>
-          <div style={{ 
-            background: '#2a2a2a', 
-            padding: '0.75rem', 
-            borderRadius: '4px',
-            marginBottom: '0.5rem',
-            cursor: 'pointer'
-          }}>
+          <div
+            style={{
+              background: '#2a2a2a',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
             JavaScript: Captura e exibe número
           </div>
-          <div style={{ 
-            background: '#2a2a2a', 
-            padding: '0.75rem', 
-            borderRadius: '4px',
-            marginBottom: '0.5rem',
-            cursor: 'pointer'
-          }}>
+          <div
+            style={{
+              background: '#2a2a2a',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '0.5rem',
+              cursor: 'pointer',
+            }}
+          >
             IA para criar imagens sugeridas
           </div>
         </div>
-
-        <div style={{ 
-          position: 'fixed', 
-          bottom: '0', 
-          left: '0', 
-          width: '260px',
-          padding: '1rem',
-          borderTop: '1px solid #333',
-          background: '#1a1a1a'
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '0',
+            left: '0',
+            width: '260px',
+            padding: '1rem',
+            borderTop: '1px solid #333',
+            background: '#1a1a1a',
+          }}
+        >
           <div style={{ marginBottom: '1rem', cursor: 'pointer' }}>Get App (NEW)</div>
           <div style={{ cursor: 'pointer' }}>My Profile</div>
         </div>
       </div>
 
       {/* Conteúdo principal */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
-        <header 
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <header
           style={{
             backgroundColor: '#1e1e1e',
             padding: '1.5rem',
@@ -335,17 +403,8 @@ export default function Chat() {
         >
           LyrIA Teste
         </header>
-
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '1.5rem',
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            width: '100%',
-          }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -358,23 +417,17 @@ export default function Chat() {
                 <div
                   style={{
                     maxWidth: '70%',
-                    background: msg.sender === 'user' 
-                      ? 'linear-gradient(135deg, #4caf50 0%, #43a047 100%)' 
-                      : 'linear-gradient(135deg, #333 0%, #424242 100%)',
+                    background:
+                      msg.sender === 'user'
+                        ? 'linear-gradient(135deg, #4caf50 0%, #43a047 100%)'
+                        : 'linear-gradient(135deg, #333 0%, #424242 100%)',
                     color: '#fff',
                     padding: '12px 16px',
-                    borderRadius: msg.sender === 'user' 
-                      ? '18px 18px 4px 18px'
-                      : '18px 18px 18px 4px',
+                    borderRadius: msg.sender === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
                   }}
                 >
-                  <div style={{
-                    fontSize: '0.8rem',
-                    opacity: 0.7,
-                    marginBottom: '4px',
-                    fontWeight: 'bold',
-                  }}>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '4px', fontWeight: 'bold' }}>
                     {msg.sender === 'user' ? 'Você' : 'LyrIA'} • {msg.timestamp}
                   </div>
                   <div>{msg.text}</div>
@@ -384,18 +437,27 @@ export default function Chat() {
             <div ref={messagesEndRef} />
           </div>
         </div>
-
-        <form onSubmit={sendMessage} style={{
-          padding: '1.5rem',
-          background: '#2a2a2a',
-          borderTop: '1px solid #333',
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            gap: '1rem',
-          }}>
+        <form onSubmit={sendMessage} style={{ padding: '1.5rem', background: '#2a2a2a', borderTop: '1px solid #333' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '1rem' }}>
+            {/* NOVO: Adiciona o seletor de persona no formulário principal */}
+            <select
+              value={persona}
+              onChange={(e) => setPersona(e.target.value)}
+              style={{
+                padding: '1rem',
+                borderRadius: '30px',
+                border: 'none',
+                backgroundColor: '#333',
+                color: '#fff',
+                fontSize: '1rem',
+                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)',
+                outline: 'none',
+              }}
+            >
+              <option value="default_persona">Padrão</option>
+              <option value="amigavel">Amigável</option>
+              <option value="tecnico">Técnico</option>
+            </select>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
