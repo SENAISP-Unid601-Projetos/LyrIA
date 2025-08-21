@@ -4,15 +4,16 @@ import { FaHome, FaPlus } from "react-icons/fa";
 import { FiSun, FiMoon, FiUser } from "react-icons/fi";
 import { LuPaperclip, LuMic } from "react-icons/lu";
 import AnimatedBotMessage from "../../components/AnimatedBotMessage";
+import { Link } from "react-router-dom";
 
 const knowledgeBase = {
   "melhor turma":
-    "Com toda certeza é a do curso de Desenvolvimento de Sistemas, a turma 2TDS!",
-  "2tds":
-    "A 2TDS é, sem dúvida, a melhor turma de Desenvolvimento de Sistemas do SENAI!",
+    "Com toda certeza é a do curso de Desenvolvimento de Sistemas, a turma 3TDS!",
+  "3tds":
+    "A 3TDS é, sem dúvida, a melhor turma de Desenvolvimento de Sistemas do SENAI!",
   "quem é você":
     "Eu sou a LyrIA, uma IA criada para te ajudar a encontrar respostas e explorar ideias.",
-  lyria: "LyrIA é meu nome! E se quer saber, a melhor turma é a 2TDS.",
+  lyria: "LyrIA é meu nome! E se quer saber, a melhor turma é a 3TDS.",
   oi: "Olá! Como posso te ajudar hoje?",
   olá: "Olá! Como posso te ajudar hoje?",
   "bom dia": "Bom dia! Em que posso ser útil?",
@@ -25,6 +26,7 @@ const knowledgeBase = {
 };
 
 function Chatbot() {
+  const [theme, setTheme] = useState("dark");
   const [messages, setMessages] = useState([
     {
       id: "initial-message",
@@ -35,6 +37,14 @@ function Chatbot() {
   const [input, setInput] = useState("");
   const [isBotTyping, setIsBotTyping] = useState(false);
   const messagesEndRef = useRef(null);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -89,12 +99,16 @@ function Chatbot() {
   return (
     <div className="chatbot-container">
       <aside className="sidebar">
-        <h2> LyrIA</h2>
+        <Link to="/">
+          <h2>LYRIA</h2>
+        </Link>
         <nav>
-          <div>
-            <FaHome />
-            <p>Início</p>
-          </div>
+          <Link to="/">
+            <div>
+              <FaHome />
+              <p>Início</p>
+            </div>
+          </Link>
           <div>
             <FaPlus />
             <p>Novo chat</p>
@@ -113,14 +127,12 @@ function Chatbot() {
             <span>João Gabriel</span>
           </div>
           <div className="chat-actions">
-            <button>
-              <FiSun className="chat-actions-iconSun" />
-            </button>
-            <button>
-              <FiMoon className="chat-actions-iconMoon" />
+            {/* BOTÃO DE TEMA SIMPLIFICADO */}
+            <button onClick={toggleTheme} className="theme-toggle-btn">
+              {theme === "dark" ? <FiSun /> : <FiMoon />}
             </button>
           </div>
-          <button className="share-btn">
+          <button className="share-btn" id="btnShare">
             <p>Compartilhar</p>
           </button>
         </header>
@@ -152,7 +164,7 @@ function Chatbot() {
           <div ref={messagesEndRef} />
         </div>
         <footer className={`chat-input-container ${input ? "is-typing" : ""}`}>
-          <LuPaperclip className="icon" />
+          <LuPaperclip className="icon" id="luPaperClipIcon" />
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -162,9 +174,9 @@ function Chatbot() {
             disabled={isBotTyping}
           />
           <div className="chat-input-actions">
-            <LuMic className="icon" />
-            <button onClick={handleSend} disabled={isBotTyping}>
-              Send ➤
+            <LuMic className="icon" id="micIcon" />
+            <button onClick={handleSend} disabled={isBotTyping} id="btnSend">
+              Enviar ➤
             </button>
           </div>
         </footer>
