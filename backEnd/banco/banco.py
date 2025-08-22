@@ -1,29 +1,30 @@
 import sqlite3
+from datetime import datetime
+import os
 
-DB_NOME = "lyria.db"
+DB_NOME = os.path.join(os.path.dirname(__file__), "lyria.db")
 
 def criar_banco():
     conn = sqlite3.connect(DB_NOME)
     cursor = conn.cursor()
 
-    # Tabela de usuários
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
-        email TEXT NOT NULL,
-        senha_hash TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        senha_hash TEXT,
+        persona_escolhida TEXT,
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
 
-    # Tabela de conversas
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS conversas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario_id INTEGER NOT NULL,
-        mensagens TEXT NOT NULL,
+        mensagens TEXT,
         iniciado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status TEXT,
@@ -31,7 +32,6 @@ def criar_banco():
     );
     """)
 
-    # Tabela de user_requests
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,7 +44,6 @@ def criar_banco():
     );
     """)
 
-    # Tabela de ai_responses
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS ai_responses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +56,6 @@ def criar_banco():
     );    
     """)
 
-    # Tabela de mensagens
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS mensagens (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,7 +69,6 @@ def criar_banco():
     );
     """)
 
-    # Tabela de memórias
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS memorias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,62 +87,65 @@ def criar_banco():
 
     conn.commit()
     conn.close()
-    print("Banco de dados criado com sucesso!")
+    print("Banco de dados criado/atualizado com sucesso!")
 
 def pegarPersonaEscolhida(usuario):
     conn = sqlite3.connect(DB_NOME)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("SELECT persona_escolhida FROM usuarios WHERE nome = ?", (usuario,))
     result = cursor.fetchone()
     conn.close()
-    return result
+    return result["persona_escolhida"] if result else None
 
-def escolherApersona(persona,usuario):
+def escolherApersona(persona, usuario):
     conn = sqlite3.connect(DB_NOME)
     cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE usuarios SET persona_escolhida = ? WHERE nome = ?
-    """, (persona, usuario))
-        
-    if cursor.rowcount == 0:
-        cursor.execute("""
-            INSERT INTO usuarios (nome, persona_escolhida) VALUES (?, ?)
-        """, (usuario, persona))
-        
+    cursor.execute("UPDATE usuarios SET persona_escolhida = ? WHERE nome = ?", (persona, usuario))
     conn.commit()
     conn.close()
 
-def criarUsuario(nome,email,persona):
+def criarUsuario(nome, email, persona, senha_hash=None):
     conn = sqlite3.connect(DB_NOME)
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO usuarios (nome, email, persona_escolhida) 
-        VALUES (?, ?, ?)
-    """, (nome, email, persona))
+        INSERT INTO usuarios (nome, email, persona_escolhida, senha_hash, criado_em, ultimo_acesso)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (nome, email, persona, senha_hash, datetime.now(), datetime.now()))
     conn.commit()
+    usuario_id = cursor.lastrowid
     conn.close()
+    return usuario_id
 
 def procurarUsuarioPorEmail(usuarioEmail):
     conn = sqlite3.connect(DB_NOME)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM usuarios WHERE email = ?", (usuarioEmail,))
     result = cursor.fetchone()
     conn.close()
-    return result
+    return dict(result) if result else None
 
-def pegarHistorico(usuario):
+def pegarHistorico(usuario, limite=3):
     conn = sqlite3.connect(DB_NOME)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT pergunta, resposta, timestamp 
-        FROM mensagens 
-        WHERE usuario = ? 
-        ORDER BY id DESC 
-        LIMIT 3
-    """, (usuario,))
+        SELECT ur.conteudo AS pergunta,
+               ar.conteudo AS resposta,
+               m.criado_em AS timestamp
+        FROM mensagens m
+        JOIN user_requests ur ON m.request_id = ur.id
+        JOIN ai_responses ar ON m.response_id = ar.id
+        JOIN conversas c ON m.conversa_id = c.id
+        JOIN usuarios u ON c.usuario_id = u.id
+        WHERE u.nome = ?
+        ORDER BY m.id DESC
+        LIMIT ?
+    """, (usuario, limite))
     results = cursor.fetchall()
     conn.close()
-    return results
+    return [dict(row) for row in results]
 
 if __name__ == "__main__":
     criar_banco()
