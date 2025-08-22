@@ -1,20 +1,24 @@
 import requests
 import sqlite3
-import time
 import pyttsx3
 import speech_recognition as sr
-import wave
 import os
 from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
+from banco.banco import (
+    carregar_conversas, 
+    salvarMensagem, 
+    pegarPersonaEscolhida,
+    escolherApersona,
+    criarUsuario,
+    criar_banco
+)
 
-# Configurações
 LIMITE_HISTORICO = 12
 SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
 OLLAMA_HOST = "http://localhost:11434"
 OLLAMA_MODEL = "gemma3n:latest"
 ACTIVATION_WORDS = ["lyria", "olá", "oi", "alô"]
 
-# Inicializações
 engine = pyttsx3.init()
 engine.setProperty('rate', 160)
 voices = engine.getProperty('voices')
@@ -25,30 +29,20 @@ recognizer.dynamic_energy_threshold = False
 recognizer.energy_threshold = 400
 recognizer.pause_threshold = 0.8
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(BASE_DIR, 'banco', 'lyria.db')
-conn = sqlite3.connect(db_path)
-cursor = conn.cursor()
-
-# Funções do banco (mantidas)
 def carregar_memorias(usuario):
-    cursor.execute("SELECT texto FROM memorias WHERE usuario = ?", (usuario,))
-    return [linha[0] for linha in cursor.fetchall()]
+    """
+    Carrega memórias do usuário (importa da banco.banco)
+    """
+    from banco.banco import carregar_memorias as carregar_memorias_db
+    return carregar_memorias_db(usuario)
 
-def carregar_conversas(usuario):
-    cursor.execute("SELECT pergunta, resposta FROM mensagens WHERE usuario = ? ORDER BY id ASC", (usuario,))
-    return [{"pergunta": p, "resposta": r} for p, r in cursor.fetchall()]
-
-def salvar_conversa(usuario, pergunta, resposta):
-    cursor.execute("INSERT INTO mensagens (usuario, pergunta, resposta) VALUES (?, ?, ?)", (usuario, pergunta, resposta))
-    conn.commit()
-
-# Funções de voz melhoradas
 def falar(texto):
+    """Converte texto em fala"""
     engine.say(texto)
     engine.runAndWait()
 
 def ouvir_microfone():
+    """Captura áudio do microfone e converte para texto"""
     with sr.Microphone() as source:
         print("\nAguardando ativação... (diga 'Lyria' ou 'Olá')")
         recognizer.adjust_for_ambient_noise(source, duration=1)
@@ -77,93 +71,199 @@ def ouvir_microfone():
             return ""
 
 def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
-    prompt = f"{persona}\nHistórico:\n"
-    for msg in conversas[-LIMITE_HISTORICO:]:
-        prompt += f"Usuário: {msg['pergunta']}\nLyria: {msg['resposta']}\n"
+    """Envia pergunta para o modelo Ollama com otimizações"""
+    
+    LIMITE_HISTORICO_REDUZIDO = 6
+    
+    prompt_parts = [persona]
+    
+    if conversas:
+        prompt_parts.append("Histórico recente:")
+        for msg in conversas[-LIMITE_HISTORICO_REDUZIDO:]:
+            prompt_parts.append(f"Usuário: {msg['pergunta']}")
+            prompt_parts.append(f"Lyria: {msg['resposta']}")
     
     if contexto_web:
-        prompt += f"Contexto de pesquisa na web, considere isso ACIMA dos dados que você tem pois estão mais atualizados, mesmo que sejam diferentes. Considere esse seguinte contexto para sua resposta: {contexto_web}\n"
-        
-    prompt += f"Usuário: {pergunta}\nLyria:"
+        contexto_limitado = contexto_web[:500]  
+        prompt_parts.append(f"Info web atual: {contexto_limitado}")
+    
+    prompt_parts.append(f"Usuário: {pergunta}")
+    prompt_parts.append("Lyria:")
+    
+    prompt = "\n".join(prompt_parts)
+    
+    payload = {
+        'model': OLLAMA_MODEL,
+        'prompt': prompt,
+        'stream': False,
+        'options': {
+            'temperature': 0.7,      
+            'top_p': 0.9,           
+            'num_predict': 200,     
+            'stop': ['\n\nUsuário:', 'Usuário:']  
+        }
+    }
     
     try:
+        print(f"Enviando para Ollama... (prompt: {len(prompt)} chars)")
+        
         response = requests.post(
             f"{OLLAMA_HOST}/api/generate",
-            json={'model': OLLAMA_MODEL, 'prompt': prompt, 'stream': False},
-            timeout=30
+            json=payload,
+            timeout=60,  
+            headers={'Content-Type': 'application/json'}
         )
+        
         response.raise_for_status()
         data = response.json()
-        return data.get('response', "Não entendi")
-    except requests.exceptions.RequestException as e:
-        print(f"Erro ao conectar ou receber resposta do Ollama: {e}")
-        return "Erro de conexão"
+        
+        resposta = data.get('response', '').strip()
+        
+        if not resposta:
+            return "Desculpe, não consegui gerar uma resposta adequada."
+        
+        if resposta.startswith('Lyria:'):
+            resposta = resposta[6:].strip()
+            
+        return resposta
+        
+    except requests.exceptions.Timeout:
+        print("Timeout - Ollama demorou mais que 45s")
+        return "Desculpe, estou processando mais devagar hoje. Pode repetir a pergunta?"
+        
+    except requests.exceptions.ConnectionError:
+        print("Erro de conexão - Ollama pode estar offline")
+        return "Não consegui me conectar ao sistema. Verifique se o Ollama está rodando."
+        
+    except requests.exceptions.HTTPError as e:
+        print(f"Erro HTTP {e.response.status_code}: {e.response.text}")
+        return "Houve um problema no processamento. Tente novamente."
+        
+    except Exception as e:
+        print(f"Erro inesperado: {e}")
+        return "Erro interno. Tente novamente em alguns instantes."
+
+def verificar_ollama_status():
+    """Verifica se o Ollama está rodando e respondendo"""
+    try:
+        response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=5)
+        if response.status_code == 200:
+            modelos = response.json().get('models', [])
+            modelo_existe = any(m.get('name', '').startswith(OLLAMA_MODEL.split(':')[0]) for m in modelos)
+            return {
+                'status': 'online',
+                'modelo_existe': modelo_existe,
+                'modelos_disponiveis': [m.get('name') for m in modelos]
+            }
+        else:
+            return {'status': 'erro', 'detalhes': f'HTTP {response.status_code}'}
+            
+    except requests.exceptions.ConnectionError:
+        return {'status': 'offline', 'detalhes': 'Não foi possível conectar'}
+    except Exception as e:
+        return {'status': 'erro', 'detalhes': str(e)}
 
 def buscar_na_web(pergunta):
+    """Busca informações na web usando SerpAPI"""
     try:
         params = {"q": pergunta, "hl": "pt-br", "gl": "br", "api_key": SERPAPI_KEY}
         res = requests.get("https://serpapi.com/search", params=params, timeout=10)
-        trechos = [r.get("snippet", "") for r in res.json().get("organic_results", [])[:2]]
-        return " ".join(trechos)
-    except Exception:
+        res.raise_for_status()
+        
+        resultados = res.json().get("organic_results", [])
+        trechos = [r.get("snippet", "") for r in resultados[:2] if r.get("snippet")]
+        return " ".join(trechos) if trechos else None
+        
+    except Exception as e:
+        print(f"Erro na busca web: {e}")
         return None
 
-# Menu principal
-print("Do que você precisa?")
-print("1. Professor")
-print("2. Empresarial")
-escolha = input("Escolha: ").strip()
+def get_persona_texto(persona_tipo):
+    """Retorna o texto completo da persona baseado no tipo"""
+    personas = {
+        'professor': "Você é a professora Lyria, responda de forma didática e empática. Ajude o usuário a aprender de forma clara e motivadora.",
+        'empresarial': "Você é a assistente Lyria, responda de forma profissional e objetiva. Foque em soluções práticas e eficiência."
+    }
+    return personas.get(persona_tipo, personas['professor'])
 
-if escolha == '1':
-    persona = "Você é a professora Lyria, responda de forma didática e empática, tratando o usuário como um aluno. Responda de forma curta e pergunte se o aluno deseja mais informações, se sim então você poderá explicar o assunto extensivamente e de forma didática. De forma alguma fale palavras de baixo calão e sempre seja gentil e simpática. Caso a pesquisa na web diga algo contrário do que você sabe, prefira o que foi pesquisado pois pode estar mais atualizado."
-elif escolha == '2':
-    persona = "Você é a assistente Lyria, responda de forma profissional e objetiva. Seja clara e responda de forma curta, somente se extendendo caso o usuário diga que quer isso, então pergunte sempre se ele quer saber mais. Caso a pesquisa na web diga algo contrário do que você sabe, prefira o que foi pesquisado pois pode estar mais atualizado."
-else:
-    print("Opção inválida")
-    exit()
-
-print("\nModo de interação:")
-print("1. Apenas texto")
-print("2. Voz e texto")
-modo = input("Escolha: ").strip()
-
-usuario = input("Informe seu nome: ").strip().lower()
-cursor.execute("INSERT OR IGNORE INTO usuarios (nome) VALUES (?)", (usuario,))
-conn.commit()
-
-# Loop principal
-if modo == '1':
-    print("\nModo texto ativo (digite 'sair' para encerrar)")
-    while True:
-        entrada = input("Você: ").strip()
-        if entrada.lower() == 'sair':
-            break
-            
-        resposta = perguntar_ollama(entrada, carregar_conversas(usuario), 
-                                 carregar_memorias(usuario), persona)
-        print(f"Lyria: {resposta}")
-        salvar_conversa(usuario, entrada, resposta)
-
-else:
-    print("\nModo voz ativo (diga 'Lyria' ou 'Olá' para ativar, 'Sair' para encerrar)")
-    falar("Modo voz ativado. Diga Lyria ou Olá quando quiser falar comigo.")
+if __name__ == "__main__":
+    criar_banco()
     
-    while True:
-        entrada = ouvir_microfone()
-        
-        if entrada == "sair":
-            falar("Até logo!")
-            break
-        elif not entrada:
-            continue
-            
-        # Processa a pergunta
-        contexto_web = buscar_na_web(entrada) if deve_buscar_na_web(entrada) else None
-        resposta = perguntar_ollama(entrada, carregar_conversas(usuario),
-                                 carregar_memorias(usuario), persona, contexto_web)
-        
-        print(f"Lyria: {resposta}")
-        falar(resposta)
-        salvar_conversa(usuario, entrada, resposta)
+    print("Do que você precisa?")
+    print("1. Professor")
+    print("2. Empresarial")
+    escolha = input("Escolha: ").strip()
 
-conn.close()
+    if escolha == '1':
+        persona_tipo = 'professor'
+    elif escolha == '2':
+        persona_tipo = 'empresarial'
+    else:
+        print("Opção inválida")
+        exit()
+
+    print("\nModo de interação:")
+    print("1. Apenas texto")
+    print("2. Voz e texto")
+    modo = input("Escolha: ").strip()
+
+    usuario = input("Informe seu nome: ").strip().lower()
+    
+    try:
+        criarUsuario(usuario, f"{usuario}@local.com", persona_tipo)
+    except:
+        escolherApersona(persona_tipo, usuario)
+    
+    persona = get_persona_texto(persona_tipo)
+
+    if modo == '1':
+        print("\nModo texto ativo (digite 'sair' para encerrar)")
+        while True:
+            entrada = input("Você: ").strip()
+            if entrada.lower() == 'sair':
+                break
+                
+            contexto_web = None
+            if deve_buscar_na_web(entrada):
+                contexto_web = buscar_na_web(entrada)
+                
+            resposta = perguntar_ollama(
+                entrada, 
+                carregar_conversas(usuario), 
+                carregar_memorias(usuario), 
+                persona,
+                contexto_web
+            )
+            
+            print(f"Lyria: {resposta}")
+            salvarMensagem(usuario, entrada, resposta, modelo_usado="ollama", tokens=None)
+
+    else:
+        print("\nModo voz ativo (diga 'Lyria' ou 'Olá' para ativar, 'Sair' para encerrar)")
+        falar("Modo voz ativado. Diga Lyria ou Olá quando quiser falar comigo.")
+        
+        while True:
+            entrada = ouvir_microfone()
+            
+            if entrada == "sair":
+                falar("Até logo!")
+                break
+            elif not entrada:
+                continue
+                
+            # Busca contexto web se necessário
+            contexto_web = None
+            if deve_buscar_na_web(entrada):
+                contexto_web = buscar_na_web(entrada)
+                
+            resposta = perguntar_ollama(
+                entrada,
+                carregar_conversas(usuario),
+                carregar_memorias(usuario), 
+                persona, 
+                contexto_web
+            )
+            
+            print(f"Lyria: {resposta}")
+            falar(resposta)
+            salvarMensagem(usuario, entrada, resposta, modelo_usado="ollama", tokens=None)
