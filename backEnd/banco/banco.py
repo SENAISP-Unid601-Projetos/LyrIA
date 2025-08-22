@@ -89,6 +89,39 @@ def criar_banco():
     conn.close()
     print("Banco de dados criado/atualizado com sucesso!")
 
+def carregar_memorias(usuario, limite=20):
+    """
+    Carrega as memórias/conversas do usuário (o que ele falou e o que a IA respondeu)
+    Retorna as conversas mais recentes para dar contexto à IA
+    """
+    conn = sqlite3.connect(DB_NOME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT ur.conteudo AS usuario_disse,
+               ar.conteudo AS ia_respondeu,
+               m.criado_em AS quando
+        FROM mensagens m
+        JOIN user_requests ur ON m.request_id = ur.id
+        JOIN ai_responses ar ON m.response_id = ar.id
+        JOIN conversas c ON m.conversa_id = c.id
+        JOIN usuarios u ON c.usuario_id = u.id
+        WHERE u.nome = ?
+        ORDER BY m.criado_em DESC
+        LIMIT ?
+    """, (usuario, limite))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    memorias = []
+    for row in results:
+        memorias.append(f"Usuário: {row['usuario_disse']}")
+        memorias.append(f"IA: {row['ia_respondeu']}")
+    
+    return list(reversed(memorias))
+
 def pegarPersonaEscolhida(usuario):
     conn = sqlite3.connect(DB_NOME)
     conn.row_factory = sqlite3.Row
@@ -140,12 +173,83 @@ def pegarHistorico(usuario, limite=3):
         JOIN conversas c ON m.conversa_id = c.id
         JOIN usuarios u ON c.usuario_id = u.id
         WHERE u.nome = ?
-        ORDER BY m.id DESC
+        ORDER BY m.criado_em DESC
         LIMIT ?
     """, (usuario, limite))
     results = cursor.fetchall()
     conn.close()
     return [dict(row) for row in results]
 
-if __name__ == "__main__":
-    criar_banco()
+def carregar_conversas(usuario, limite=12):
+    """
+    Retorna lista de conversas do usuário, com pergunta e resposta
+    """
+    conn = sqlite3.connect(DB_NOME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT ur.conteudo AS pergunta, ar.conteudo AS resposta
+        FROM mensagens m
+        JOIN user_requests ur ON m.request_id = ur.id
+        JOIN ai_responses ar ON m.response_id = ar.id
+        JOIN conversas c ON m.conversa_id = c.id
+        JOIN usuarios u ON c.usuario_id = u.id
+        WHERE u.nome = ?
+        ORDER BY m.criado_em ASC
+        LIMIT ?
+    """, (usuario, limite))
+    results = cursor.fetchall()
+    conn.close()
+    return [{"pergunta": row["pergunta"], "resposta": row["resposta"]} for row in results]
+
+def salvarMensagem(usuario, pergunta, resposta, modelo_usado=None, tokens=None):
+    """
+    Salva a pergunta e resposta no banco, criando conversa se necessário
+    """
+    conn = sqlite3.connect(DB_NOME)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id FROM conversas 
+        WHERE usuario_id = (SELECT id FROM usuarios WHERE nome=?)
+        ORDER BY iniciado_em DESC LIMIT 1
+    """, (usuario,))
+    conversa = cursor.fetchone()
+    
+    if conversa:
+        conversa_id = conversa[0]
+    else:
+        cursor.execute("""
+            INSERT INTO conversas (usuario_id) VALUES ((SELECT id FROM usuarios WHERE nome=?))
+        """, (usuario,))
+        conversa_id = cursor.lastrowid
+
+    cursor.execute("""
+        INSERT INTO user_requests (usuario_id, conversa_id, conteudo)
+        VALUES ((SELECT id FROM usuarios WHERE nome=?), ?, ?)
+    """, (usuario, conversa_id, pergunta))
+    request_id = cursor.lastrowid
+
+    cursor.execute("""
+        INSERT INTO ai_responses (request_id, conteudo, modelo_usado, tokens)
+        VALUES (?, ?, ?, ?)
+    """, (request_id, resposta, modelo_usado, tokens))
+    response_id = cursor.lastrowid
+
+    cursor.execute("""
+        INSERT INTO mensagens (conversa_id, request_id, response_id)
+        VALUES (?, ?, ?)
+    """, (conversa_id, request_id, response_id))
+
+    cursor.execute("""
+        INSERT INTO memorias (usuario_id, chave, valor, tipo, conversa_origem)
+        VALUES ((SELECT id FROM usuarios WHERE nome=?), ?, ?, 'conversa', ?)
+    """, (usuario, f"pergunta_{request_id}", pergunta, conversa_id))
+
+    cursor.execute("""
+        INSERT INTO memorias (usuario_id, chave, valor, tipo, conversa_origem)
+        VALUES ((SELECT id FROM usuarios WHERE nome=?), ?, ?, 'conversa', ?)
+    """, (usuario, f"resposta_{response_id}", resposta, conversa_id))
+
+    conn.commit()
+    conn.close()
