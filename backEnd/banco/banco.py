@@ -9,28 +9,82 @@ def criar_banco():
     # Tabela de usuários
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS usuarios (
-        nome TEXT PRIMARY KEY
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        email TEXT NOT NULL,
+        senha_hash TEXT NOT NULL,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
 
-    # Tabela de mensagens da conversa
+    # Tabela de conversas
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS conversas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        mensagens TEXT NOT NULL,
+        iniciado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status TEXT,
+        FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
+    );
+    """)
+
+    # Tabela de user_requests
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL,
+        conversa_id INTEGER NOT NULL,
+        conteudo TEXT NOT NULL,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(usuario_id) REFERENCES usuarios(id),
+        FOREIGN KEY(conversa_id) REFERENCES conversas(id)
+    );
+    """)
+
+    # Tabela de ai_responses
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_responses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        request_id INTEGER NOT NULL,
+        conteudo TEXT NOT NULL,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        modelo_usado TEXT,
+        tokens INTEGER,
+        FOREIGN KEY(request_id) REFERENCES user_requests(id)
+    );    
+    """)
+
+    # Tabela de mensagens
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS mensagens (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario TEXT,
-        pergunta TEXT,
-        resposta TEXT,
-        FOREIGN KEY(usuario) REFERENCES usuarios(nome)
+        conversa_id INTEGER NOT NULL,
+        request_id INTEGER NOT NULL,
+        response_id INTEGER NOT NULL,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(conversa_id) REFERENCES conversas(id),
+        FOREIGN KEY(request_id) REFERENCES user_requests(id),
+        FOREIGN KEY(response_id) REFERENCES ai_responses(id)
     );
     """)
 
-    # Tabela de memórias (informações importantes)
+    # Tabela de memórias
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS memorias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        usuario TEXT,
-        texto TEXT,
-        FOREIGN KEY(usuario) REFERENCES usuarios(nome)
+        usuario_id INTEGER NOT NULL,
+        chave TEXT NOT NULL,
+        valor TEXT NOT NULL,
+        tipo TEXT,
+        relevancia INTEGER DEFAULT 0,
+        conversa_origem INTEGER,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expira_em TIMESTAMP,
+        FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
     );
     """)
 
