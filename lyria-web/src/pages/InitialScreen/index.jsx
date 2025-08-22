@@ -1,72 +1,87 @@
-import { ChatCircleDots } from 'phosphor-react';
+import { useState } from 'react'; // Importa o useState
 import './Styles/styles.css';
-
-// NOVO: Imports para o Header e Footer
-// Por favor, ajuste o caminho se seus componentes estiverem em outra pasta!
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
 import { Link } from 'react-router-dom';
+import Galaxy from '../../components/Galaxy/Galaxy.jsx';
+import { FaTimes } from "react-icons/fa"; // Ícone para o botão de fechar
 
 function InitialScreen() {
+  // Estado para controlar a visibilidade do modal de informações
+  const [isInfoVisible, setInfoVisible] = useState(false);
+
+  // Função para mostrar ou esconder o modal
+  const toggleInfoModal = () => {
+    setInfoVisible(!isInfoVisible);
+  };
+
   return (
-    // O React permite retornar múltiplos elementos usando um Fragment (<> ... </>)
-    // ou envolvendo tudo em uma div pai, como já está.
-    <div className="initial-screen"> 
-      
-      {/* NOVO: Adicionado o componente Header no topo da página */}
-      <Header />
-
-      <div className="chess-layout">
-        {/* Parte superior - dois quadrados grandes */}
-        <div className="top-section">
-          <div className="half white-bg"></div>
-          <div className="half purple-bg"></div>
-          
-          {/* Imagem retangular sobreposta */}
-          <div className="image-overlay">
-            <img src="/img/LyrIA.webp" alt="YRIA" className="main-image" />
-            
-            {/* Texto e botão sobrepostos */}
-            <div className="text-content">
-              <h2 >MUDAMOS O MUNDO</h2>
-              <h2>LYRIA</h2>
-              <h3 id='effectword'>PARA UM NOVO MUNDO</h3>
-              <Link to="/chat">
-              <button className="cta-button" >
-                <span>
-                  COMEÇAR
-                </span>
-                <div className="button-icon">
-                  <ChatCircleDots size={22} weight="fill" />
-                </div>
-              </button>
-              </Link>
-            </div>
-          </div>
+    <div className="App">
+      <header className="app-header">
+        <Link to={'/'}>
+        <div className="logo">
+          <b>LYRIA</b>
         </div>
+        </Link>
+        <nav>
+          <Link to={'/RegistrationAndLogin'}>
+          <p>Entrar</p>
+          </Link>
+          <a href="#">Contato</a>
+        </nav>
+      </header>
 
-        {/* Parte inferior - cores invertidas com história */}
-        <div className="bottom-section">
-          <div className="half purple-bg">
-            <div className="secundaryimage-overlay">
-                <img src="/img/LyrIA.webp" alt="YRIA" className="secondary-image" />
-              </div>
-          </div>
-          <div className="half white-bg history-container"> 	
-            <div className="history-content">
-              <h2 id='nossa-historia'>Nossa História</h2>
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis labore possimus consectetur illo non voluptatum ullam hic porro quibusdam necessitatibus?
-              </p>
-            </div>
-            
-          </div>
+      <div className="galaxy-background">
+        <Galaxy
+          mouseRepulsion={false}
+          mouseInteraction={false}
+          density={1}
+          glowIntensity={0.55}
+          saturation={0.6}
+          hueShift={210}
+        />
+      </div>
+
+      <div className="main-content">
+        <div id="frase_efeito">
+          <b>Conheça LyrIA</b>
+        </div>
+        <span id="espaço"></span>
+        <div className="container_espaço">
+          <Link className="linkSemEstilo" to={'/chat'}>
+          <button id="comecar">
+            Começar
+          </button>
+          </Link>
+          {/* Botão "Saiba Mais" agora abre o modal */}
+          <button id="sobre" onClick={toggleInfoModal}>
+            Saiba Mais
+          </button>
         </div>
       </div>
 
-      {/* NOVO: Adicionado o componente Footer no final da página */}
-      <Footer />
-
+      {/* Modal de informações que aparece condicionalmente */}
+      {isInfoVisible && (
+        <div className="info-modal-backdrop">
+          <div className="info-modal-content">
+            <button className="close-modal-btn" onClick={toggleInfoModal}>
+              <FaTimes />
+            </button>
+            <h2>Sobre a LyrIA</h2>
+            <p>
+              LyrIA é uma assistente virtual de última geração, projetada para ser sua companheira em um universo de conhecimento e criatividade.
+            </p>
+            <p>
+              Nossa missão é fornecer respostas rápidas, insights valiosos e ajudar você a explorar novas ideias de forma intuitiva e eficiente. Construída com as mais recentes tecnologias de inteligência artificial, a LyrIA aprende e se adapta às suas necessidades.
+            </p>
+            <h3>Funcionalidades Principais:</h3>
+            <ul>
+              <li>Respostas instantâneas e precisas.</li>
+              <li>Assistência criativa para seus projetos.</li>
+              <li>Interface amigável e personalizável.</li>
+              <li>Integração com diversas ferramentas.</li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,173 +1,102 @@
 import React, { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Importe o useNavigate
+import Galaxy from "../../components/Galaxy/Galaxy";
 import "./Styles/styles.css";
 
 function LoginRegisterPage() {
-  // Estado para controlar se o formulário de registro está ativo
-  const [isRegisterActive, setRegisterActive] = useState(false);
-
-  // Estados para controlar a visibilidade da senha
+  const [isLogin, setIsLogin] = useState(true);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const navigate = useNavigate(); // Crie a função de navegação
 
-  // Função para alternar entre os formulários de login e registro
-  const toggleForms = () => {
-    setRegisterActive(!isRegisterActive);
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
+  };
+
+  // Função para lidar com o envio do formulário
+  const handleAuth = (event) => {
+    event.preventDefault(); // Previne o recarregamento da página
+    // Aqui você adicionaria sua lógica de autenticação (chamar API, etc.)
+    // Após a autenticação bem-sucedida, navegue para a página inicial
+    navigate("/");
   };
 
   return (
-    <div className="login-body">
-      <div className={`container ${isRegisterActive ? "register-active" : ""}`}>
-        {/* Box roxa animada */}
-        <div className="purple-box">
-          <h1>LYRÍA</h1>
-          <p>SUA ASSISTENTE VIRTUAL</p>
-        </div>
+    <div className="auth-body">
+      <div className="galaxy-background">
+        <Galaxy
+          density={0.8}
+          glowIntensity={0.4}
+          saturation={0.8}  
+          hueShift={220}
+          starSpeed={0.3}
+          mouseRepulsion={false}
+          repulsionStrength={1.5}
+        />
+      </div>
 
-        {/* Wrapper para os formulários */}
-        <div className="form-wrapper">
-          {/* Formulário de Login */}
-          <div
-            className={`form login-form ${isRegisterActive ? "hidden" : ""}`}
-          >
-            <h2>Login</h2>
+      <div className={`form-container ${isLogin ? "login-active" : "register-active"}`}>
+        <div className="form-content">
+          <h2 className="form-title">{isLogin ? "Bem-vindo de Volta" : "Crie sua Conta"}</h2>
+          <p className="form-subtitle">
+            {isLogin
+              ? "Entre para continuar sua jornada cósmica."
+              : "Junte-se a nós e explore o universo LyrIA."}
+          </p>
 
-            <div className="input-field">
-              <div className="input-decoration"></div>
+          {/* Adicionado o onSubmit para chamar a função handleAuth */}
+          <form onSubmit={handleAuth}>
+            {!isLogin && (
+              <div className="input-group">
+                <input type="text" placeholder="Nome" required />
+              </div>
+            )}
+            <div className="input-group">
+              <input type="email" placeholder="Email" required />
+            </div>
+            <div className="input-group">
               <input
-                type="email"
-                placeholder="Email"
-                className="login-input"
+                type={passwordVisible ? "text" : "password"}
+                placeholder="Senha"
                 required
               />
+              <span
+                className="password-toggle-icon"
+                onClick={() => setPasswordVisible(!passwordVisible)}
+              >
+                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
-
-            <div className="input-field">
-              <div className="input-decoration"></div>
-              <div className="password-container">
+            {!isLogin && (
+              <div className="input-group">
                 <input
-                  type={passwordVisible ? "text" : "password"}
-                  placeholder="Senha"
-                  className="login-input"
+                  type={confirmPasswordVisible ? "text" : "password"}
+                  placeholder="Confirmar Senha"
                   required
                 />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setPasswordVisible(!passwordVisible)}
-                >
-                  <i
-                    className={`fas ${
-                      passwordVisible ? "fa-eye-slash" : "fa-eye"
-                    }`}
-                  ></i>
-                </button>
+                 <span
+                className="password-toggle-icon"
+                onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+              >
+                {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+              </span>
               </div>
-            </div>
+            )}
 
-            <div className="checkbox-container">
-              <input type="checkbox" id="remember" />
-              <label htmlFor="remember">Manter-me logado</label>
-              <a href="#" className="help-link">
-                Precisa de ajuda?
-              </a>
-            </div>
+            {isLogin && (
+                <a href="#" className="forgot-password">Esqueceu sua senha?</a>
+            )}
 
-            <button>ENTRAR</button>
+            <button type="submit" className="submit-btn">
+              {isLogin ? "ENTRAR" : "CADASTRAR"}
+            </button>
+          </form>
 
-            <span onClick={toggleForms} className="switch-link">
-              Não possui uma conta? Crie uma agora!
-            </span>
-          </div>
-
-          {/* Formulário de Cadastro */}
-          <div
-            className={`form register-form ${isRegisterActive ? "" : "hidden"}`}
-          >
-            <h2>CADASTRAR-SE</h2>
-
-            <div className="input-field">
-              <div className="input-decoration"></div>
-              <input
-                type="text"
-                placeholder="Nome"
-                className="compact-input"
-                required
-              />
-            </div>
-
-            <div className="input-field">
-              <div className="input-decoration"></div>
-              <input
-                type="email"
-                placeholder="Email"
-                className="compact-input"
-                required
-              />
-            </div>
-
-            <div className="form-row">
-              <div className="input-field" style={{ flex: 1 }}>
-                <div className="input-decoration"></div>
-                <div className="password-container">
-                  <input
-                    type={passwordVisible ? "text" : "password"}
-                    placeholder="Senha"
-                    className="compact-input"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="toggle-password"
-                    onClick={() => setPasswordVisible(!passwordVisible)}
-                  >
-                    <i
-                      className={`fas ${
-                        passwordVisible ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                    ></i>
-                  </button>
-                </div>
-              </div>
-
-              <div className="input-field" style={{ flex: 1 }}>
-                <div className="input-decoration"></div>
-                <div className="password-container">
-                  <input
-                    type={confirmPasswordVisible ? "text" : "password"}
-                    placeholder="Confirmar senha"
-                    className="compact-input"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="toggle-password"
-                    onClick={() =>
-                      setConfirmPasswordVisible(!confirmPasswordVisible)
-                    }
-                  >
-                    <i
-                      className={`fas ${
-                        confirmPasswordVisible ? "fa-eye-slash" : "fa-eye"
-                      }`}
-                    ></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="terms-box">
-              <input type="checkbox" id="terms-checkbox" required />
-              <label htmlFor="terms-checkbox">
-                <span className="terms-prefix">Concordo com os </span>
-                <span className="terms-highlight">TERMOS de uso</span>
-              </label>
-            </div>
-
-            <button className="compact-btn">CADASTRAR</button>
-            <span onClick={toggleForms} className="switch-back">
-              <i className="fas fa-arrow-right"></i> Voltar
-            </span>
-          </div>
+          <p className="toggle-form-text">
+            {isLogin ? "Não tem uma conta?" : "Já possui uma conta?"}{" "}
+            <span onClick={toggleForm}>{isLogin ? "Cadastre-se" : "Faça Login"}</span>
+          </p>
         </div>
       </div>
     </div>

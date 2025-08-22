@@ -1,78 +1,28 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
-
-/* ========================================================== */
-/* ARQUIVO DE CORES E TEMAS                                   */
-/* ========================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
 
 :root {
-  font-family: "Montserrat", sans-serif;
-
-  /* ---------------------------------------------------------- */
-  /* 1. PALETA DE CORES GLOBAL (NÃO MUDA EM TODO O SITE)        */
-  /* ---------------------------------------------------------- */
-  --color-white: #f6f4f1;
+  --color-white: #FFFFFF;
+  --color-off-white: #f6f4f1;
   --color-light-purple: #c9b6f2;
-  --color-purpleV1: #6344a6;
-  --color-purpleV2: #442f73;
+  --color-purple-v1: #6344a6;
+  --color-purple-v2: #442f73;
+  --color-purple-hover: #7e5ac9;
   --color-dark-purple: #261a40;
-  --color-dark-purpleV2: #130f2f;
+  --color-dark-purple-v2: #130f2f;
   --color-dark-black: #0d0d0d;
+  --color-black: #000000;
+  --color-light-grey: #d1d1d1;
+  --color-grey: #888888;
+  --color-dark-grey: #4B4B4B;
 
-  /* ---------------------------------------------------------- */
-  /* 2. TEMA DO CHAT - DARK MODE                                */
-  /* ---------------------------------------------------------- */
-  --theme-background-page: var(--color-dark-purple);
-  --theme-background-sidebar: var(--color-dark-purpleV2);
-  --theme-background-header: var(--color-dark-purple);
-  --theme-background-input-container: var(--color-dark-purple);
-  --theme-background-input-field: var(--color-purpleV2);
-  --theme-background-message-user: var(--color-purpleV1);
-  --theme-background-message-bot: var(--color-purpleV2);
-
-  --theme-text-primary: var(--color-white);
-  --theme-text-secondary: var(--color-light-purple);
-  --theme-text-on-accent: var(--color-white);
-  --theme-text-placeholder: var(--color-light-purple);
-  --theme-profile-text: var(--color-white);
-
-  --theme-icon-primary: var(--color-light-purple);
-  --theme-icon-theme-toggler: var(--color-white);
-
-  --theme-button-share-text: var(--color-white);
-  --theme-button-share-background: transparent;
-  --theme-button-share-border: var(--color-white);
+  --font-family-main: "Montserrat", sans-serif;
+  --font-family-secondary: "Poppins", sans-serif;
 }
 
-/* ---------------------------------------------------------- */
-/* 3. TEMA DO CHAT - LIGHT MODE                               */
-/* ---------------------------------------------------------- */
-[data-theme="light"] {
-  --theme-background-page: var(--color-white);
-  --theme-background-sidebar: var(--color-light-purple);
-  --theme-background-header: var(--color-white);
-  --theme-background-input-container: var(--color-white);
-  --theme-background-input-field: var(--color-white);
-  --theme-background-message-user: var(--color-purpleV1);
-  --theme-background-message-bot: var(--color-purpleV2);
-
-  --theme-text-primary: var(--color-dark-purple);
-  --theme-text-secondary: var(--color-purpleV1);
-  --theme-text-on-accent: var(--color-white);
-  --theme-text-placeholder: var(--color-purpleV2);
-  --theme-profile-text: var(--color-dark-black);
-
-  --theme-icon-primary: var(--color-purpleV1);
-  --theme-icon-theme-toggler: var(--color-dark-purple);
-
-  --theme-button-share-text: var(--color-white);
-  --theme-button-share-background: var(--color-purpleV1);
-  --theme-button-share-border: transparent;
-}
-
-/* ---------------------------------------------------------- */
-/* Regras CSS gerais */
-/* ---------------------------------------------------------- */
 * {
   margin: 0;
-  font-size: 18px;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family-main);
 }
