@@ -1,6 +1,7 @@
-LyrIA - Sua Assistente Virtual Inteligente
+# 🤖 LyrIA - Sua Assistente Virtual Inteligente
+
 <p align="center">
-<strong>Um projeto de conclusão de curso do SENAI São Carlos</strong>
+<strong>Projeto de Conclusão de Curso - SENAI "Antonio Adolpho Lobbe" - São Carlos/SP</strong>
 </p>
 
 <p align="center">
@@ -9,111 +10,91 @@ LyrIA - Sua Assistente Virtual Inteligente
 <img alt="Licença" src="https://img.shields.io/badge/license-MIT-blue">
 </p>
 
-🤖 Sobre o Projeto
-LyrIA é uma assistente virtual inteligente desenvolvida como projeto de conclusão do curso de Técnico em Desenvolvimento de Sistemas do SENAI "Antonio Adolpho Lobbe" em São Carlos-SP. A aplicação conta com uma interface web moderna e um back-end robusto que utiliza um modelo de linguagem de grande porte (LLM) para gerar respostas dinâmicas e contextuais.
+---
 
-O objetivo do LyrIA é oferecer uma experiência de conversação natural e útil, sendo capaz de responder a perguntas gerais e, quando necessário, buscar informações atualizadas na web para garantir a precisão das respostas.
+## 📖 Sobre o Projeto
 
-✨ Funcionalidades Principais
-🎨 Interface de Chat Interativa: Front-end construído em React com uma experiência de usuário fluida e responsiva.
+LyrIA é uma **assistente virtual inteligente** desenvolvida como projeto de conclusão do curso de **Técnico em Desenvolvimento de Sistemas**.
+A aplicação possui **interface web moderna** e **back-end robusto**, utilizando **LLM (Large Language Model)** para gerar respostas dinâmicas e contextuais.
 
-🧠 Inteligência Artificial com LLM: Respostas geradas pelo modelo Gemma através do Ollama, permitindo conversas ricas e coerentes.
+✨ O objetivo é proporcionar uma experiência de **conversação natural**, capaz de responder perguntas gerais e buscar informações atualizadas na web para garantir precisão.
 
-🌐 Busca Inteligente na Web: Um classificador de intenção (scikit-learn) determina se a pergunta requer informações recentes e busca na web através da SerpAPI para fornecer dados atualizados.
+---
 
-🎭 Personas Customizáveis: O back-end permite definir diferentes "personas" para a IA (como "Professora" ou "Assistente Empresarial"), alterando seu tom e estilo de resposta.
+## ✨ Funcionalidades
 
-💾 Memória e Histórico: As conversas são salvas em um banco de dados SQLite para manter o contexto e a continuidade do diálogo.
+* 🎨 **Interface de Chat Interativa** – Front-end em **React**, responsivo e intuitivo.
+* 🧠 **IA com LLM (Gemma via Ollama)** – Respostas ricas e contextuais.
+* 🌐 **Busca Inteligente na Web** – Classificador com **Scikit-learn** que decide quando buscar dados pela **SerpAPI**.
+* 🎭 **Personas Customizáveis** – Defina diferentes estilos de resposta (ex: professora, assistente empresarial).
+* 💾 **Memória e Histórico** – Conversas salvas em **SQLite** para manter o contexto.
+* 🔐 **Autenticação de Usuário** – Login e cadastro para personalização.
+* 🌗 **Tema Claro e Escuro** – Ajuste visual para maior conforto.
 
-🔐 Autenticação de Usuário: Sistema completo de login e cadastro para uma experiência personalizada.
+---
 
-🌗 Tema Claro e Escuro: A interface possui um seletor de tema (light/dark) para maior conforto visual.
+## 📸 Screenshots
 
-📸 Screenshots
 <p align="center">
 <img src="https://github.com/user-attachments/assets/f0568557-3819-455e-915e-58d9f5b480e4" alt="Tela Inicial do LyrIA" width="700"/>
 <br>
-<em>Tela Inicial do Projeto</em>
+<em>📌 Tela Inicial</em>
 </p>
+
 <p align="center">
 <img src="https://github.com/user-attachments/assets/bb634e4c-4ea1-4845-a64d-91c049feffc4" alt="Tela de Chat do LyrIA" width="700"/>
 <br>
-<em>Interface de Chat em Ação</em>
+<em>💬 Interface de Chat em Ação</em>
 </p>
 
-🛠️ Tecnologias Utilizadas
-O projeto possui uma arquitetura moderna dividida em duas partes principais:
+---
 
-Front-End (lyria-web)
-Tecnologia
+## 🛠️ Tecnologias Utilizadas
 
-Descrição
+### ⚛️ Front-End (lyria-web)
 
-React
+| Tecnologia       | Descrição                                     |
+| ---------------- | --------------------------------------------- |
+| **React**        | Biblioteca para construção da interface.      |
+| **Vite**         | Build rápido e otimizado.                     |
+| **Axios**        | Cliente HTTP para comunicação com o back-end. |
+| **React Router** | Gerenciamento de rotas (Home, Chat, Login).   |
+| **CSS**          | Estilização moderna e componentizada.         |
 
-Biblioteca principal para a construção da interface.
+### 🐍 Back-End (backEnd)
 
-Vite
+| Tecnologia         | Descrição                                              |
+| ------------------ | ------------------------------------------------------ |
+| **Python**         | Linguagem principal do servidor.                       |
+| **Flask**          | Micro-framework web para API RESTful.                  |
+| **Ollama (Gemma)** | Execução do modelo de linguagem localmente.            |
+| **Scikit-learn**   | Classificação para decidir buscas na web.              |
+| **SQLite**         | Banco de dados para histórico de usuários e conversas. |
 
-Ferramenta de build para um ambiente de desenvolvimento rápido.
+---
 
-Axios
+## 🚀 Como Executar
 
-Cliente HTTP para realizar as chamadas à API do back-end.
+### 🔧 Pré-requisitos
 
-React Router
+* **Node.js** (v18+)
+* **Python** (v3.10+)
+* **Ollama** com modelo `gemma3n` instalado → `ollama pull gemma3n`
 
-Biblioteca para gerenciar as rotas da aplicação (Home, Chat, Login).
+---
 
-CSS
+### ⚙️ 1. Configuração do Back-End
 
-Estilização componentizada para uma interface moderna e organizada.
-
-Back-End (backEnd)
-Tecnologia
-
-Descrição
-
-Python
-
-Linguagem principal para toda a lógica do servidor.
-
-Flask
-
-Micro-framework web para a criação da API RESTful.
-
-Ollama (Gemma)
-
-Plataforma para rodar o modelo de linguagem de grande porte localmente.
-
-Scikit-learn
-
-Utilizada para treinar o modelo de classificação que decide quando buscar na web.
-
-SQLite
-
-Banco de dados relacional para armazenar dados de usuários e conversas.
-
-🚀 Como Executar o Projeto
-Para rodar o projeto em sua máquina local, siga os passos abaixo.
-
-Pré-requisitos
-Node.js (versão 18 ou superior)
-
-Python (versão 3.10 ou superior)
-
-Ollama instalado e com o modelo gemma3n baixado (ollama pull gemma3n).
-
-1. Configuração do Back-End
+```bash
 # Clone o repositório
 git clone <URL_DO_SEU_REPOSITORIO>
 
-# Navegue até a pasta do back-end
+# Acesse a pasta do back-end
 cd LyrIA-279c132dc1e8fa9840e3c120c6c09ec38c535368/backEnd
 
-# Crie um ambiente virtual (recomendado)
+# Crie um ambiente virtual
 python -m venv venv
-source venv/bin/activate  # No Windows: venv\Scripts\activate
+source venv/bin/activate  # (Windows: venv\Scripts\activate)
 
 # Instale as dependências
 pip install -r requirements.txt
@@ -123,30 +104,38 @@ python banco/banco.py
 
 # Inicie o servidor Flask
 flask run --port 5000
+```
 
-2. Configuração do Front-End
-# Em um novo terminal, navegue até a pasta do front-end
+---
+
+### 🎨 2. Configuração do Front-End
+
+```bash
+# Acesse a pasta do front-end
 cd ../lyria-web
 
 # Instale as dependências
 npm install
 
-# Inicie a aplicação React
+# Inicie a aplicação
 npm run dev
+```
 
-Após seguir os passos, acesse http://localhost:5173 (ou a porta indicada no terminal) no seu navegador.
+🔗 Acesse no navegador: **[http://localhost:5173](http://localhost:5173)**
 
-👥 Equipe
-Este projeto foi desenvolvido com muito carinho e dedicação pela seguinte equipe de estudantes do SENAI São Carlos:
+---
 
-Antony
+## 👥 Equipe
 
-Gabriel Cardoso
+Este projeto foi desenvolvido com dedicação pela equipe:
 
-João Gabriel
+* 👨‍💻 Antony
+* 👨‍💻 Gabriel Cardoso
+* 👨‍💻 João Gabriel
+* 👩‍💻 Juliana
+* 👩‍💻 Raissa
+* 👩‍💻 Vitoria
 
-Juliana
+---
 
-Raissa
-
-Vitoria
+Quer que eu monte também **uma capa estilizada para o README (banner com logo e título do projeto)** para dar aquele toque mais profissional?
