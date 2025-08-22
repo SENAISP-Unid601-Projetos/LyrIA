@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from testeDaIa import carregar_conversas, carregar_memorias, salvar_conversa, perguntar_ollama, buscar_na_web
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/Lyria/conversar', methods=['POST'])
 def conversar():
