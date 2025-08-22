@@ -279,3 +279,24 @@
 .typing-indicator span:nth-child(2) {
   animation-delay: -0.16s;
 }
+/* Adicione isso ao seu arquivo style.css */
+.chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Espaçamento entre os botões e o seletor */
+}
+
+.voice-select {
+  background-color: var(--theme-background-input-container);
+  color: var(--theme-text-primary);
+  border: 1px solid var(--theme-icon-primary);
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.voice-select:focus {
+  outline: none;
+  border-color: #007bff;
+}
