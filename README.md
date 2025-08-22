@@ -1,219 +1,118 @@
-# Sistema de Voz e Áudio para Assistente Virtual em Python
+<p align="center">
+<img src="https://github.com/user-attachments/assets/741e737c-f127-4a1a-b0d6-1b4d001cc8b6" alt="LyrIA Logo" width="200"/>
+</p>
 
-## Visão Geral
+<h1 align="center">LyrIA - Sua Assistente Virtual Inteligente</h1>
 
-Este documento explica como implementar um sistema completo de reconhecimento e síntese de voz para um assistente virtual em Python, utilizando bibliotecas simples e eficientes.
+<p align="center">
+<img alt="Status do Projeto" src="https://img.shields.io/badge/status-Em%20Desenvolvimento-yellow">
+<img alt="Linguagem Principal" src="https://img.shields.io/badge/principal-Python%20%26%20JS-blue?logo=python&logoColor=white&color=blueviolet">
+<img alt="Licença" src="https://img.shields.io/badge/license-MIT-blue">
+</p>
 
-## Dependências Necessárias
+🤖 Sobre o Projeto
+LyrIA é uma assistente virtual inteligente desenvolvida como projeto de conclusão do curso de Técnico em Desenvolvimento de Sistemas do SENAI "Antonio Adolpho Lobbe" em São Carlos-SP. A aplicação conta com uma interface web moderna e um back-end robusto que utiliza um modelo de linguagem de grande porte (LLM) para gerar respostas dinâmicas e contextuais.
 
-### Bibliotecas Python
+O objetivo do LyrIA é oferecer uma experiência de conversação natural e útil, sendo capaz de responder a perguntas gerais e, quando necessário, buscar informações atualizadas na web para garantir a precisão das respostas.
 
-Instale as seguintes bibliotecas via pip:
+📸 Screenshots
+<p align="center">Adicione aqui um GIF ou imagens da tela de chat, login, etc. para mostrar o visual do projeto!</p>
 
-```bash
-pip install speechrecognition pyttsx3 pyaudio
-```
+✨ Funcionalidades
+Interface de Chat Interativa: Front-end construído em React com uma experiência de usuário fluida e responsiva.
 
-Caso encontre problemas ao instalar o PyAudio no Windows, utilize:
+Inteligência Artificial com LLM: Respostas geradas pelo modelo Gemma através do Ollama, permitindo conversas ricas e coerentes.
 
-```bash
-pip install pipwin
-pipwin install pyaudio
-```
+Busca Inteligente na Web: Um classificador de intenção (usando scikit-learn) determina se a pergunta do usuário requer informações recentes e busca na web através da SerpAPI para fornecer dados atualizados.
 
-## Componentes do Sistema
+Personas Customizáveis: O back-end permite definir diferentes "personas" para a IA, como "Professora" ou "Assistente Empresarial", alterando seu tom e estilo de resposta.
 
-### 1. Reconhecimento de Voz (Entrada)
+Memória e Histórico de Conversa: As conversas são salvas em um banco de dados SQLite para manter o contexto e a continuidade do diálogo.
 
-Responsável por capturar áudio do microfone e converter para texto.
+Autenticação de Usuário: Sistema completo de login e cadastro para uma experiência personalizada.
 
-```python
-import speech_recognition as sr
+Tema Claro e Escuro: A interface possui um seletor de tema (light/dark) para maior conforto visual.
 
-recognizer = sr.Recognizer()
+🛠️ Tecnologias Utilizadas
+O projeto é dividido em duas partes principais:
 
-def ouvir_microfone():
-    """Captura áudio do microfone e converte para texto"""
-    with sr.Microphone() as source:
-        print("🎤 Fale agora...")
-        recognizer.adjust_for_ambient_noise(source, duration=1)
-        audio = recognizer.listen(source, timeout=5, phrase_time_limit=8)
-    
-    try:
-        texto = recognizer.recognize_google(audio, language='pt-BR')
-        print(f"Você disse: {texto}")
-        return texto
-    except sr.UnknownValueError:
-        print("Não foi possível entender o áudio")
-        return None
-    except Exception as e:
-        print(f"Erro no reconhecimento: {e}")
-        return None
-```
+Front-End (lyria-web)
+React: Biblioteca principal para a construção da interface.
 
-### 2. Síntese de Voz (Saída)
+Vite: Ferramenta de build para um ambiente de desenvolvimento rápido e otimizado.
 
-Responsável por converter texto em fala e reproduzir pelo alto-falante.
+Axios: Para realizar as chamadas à API do back-end de forma eficiente.
 
-```python
-import pyttsx3
+React Router: Para gerenciar as rotas da aplicação (Home, Chat, Login).
 
-engine = pyttsx3.init()
+CSS: Estilização componentizada para uma interface moderna e organizada.
 
-def configurar_voz():
-    """Configura propriedades da voz sintetizada"""
-    # Configurações padrão
-    engine.setProperty('rate', 180)  # Velocidade da fala (120-200)
-    engine.setProperty('volume', 1.0)  # Volume máximo (0.0 a 1.0)
-    
-    # Seleciona voz em português se disponível
-    voices = engine.getProperty('voices')
-    for voice in voices:
-        if 'pt' in voice.languages or 'portuguese' in voice.name.lower():
-            engine.setProperty('voice', voice.id)
-            break
-    return engine
+Back-End (backEnd)
+Python: Linguagem principal para toda a lógica do servidor.
 
-def falar(texto):
-    """Sintetiza e reproduz o texto em voz alta"""
-    print(f"Assistente: {texto}")
-    engine.say(texto)
-    engine.runAndWait()
-```
+Flask: Micro-framework web para a criação da API RESTful.
 
-## Implementação Completa
+Ollama (Gemma): Para rodar o modelo de linguagem de grande porte localmente.
 
-```python
-import speech_recognition as sr
-import pyttsx3
-import time
+Scikit-learn: Para treinar e utilizar o modelo de classificação que decide quando buscar na web.
 
-class AssistenteVoz:
-    def __init__(self):
-        self.recognizer = sr.Recognizer()
-        self.engine = pyttsx3.init()
-        self._configurar_voz()
-        self.interromper_fala = False
-    
-    def _configurar_voz(self):
-        """Configura propriedades da voz"""
-        self.engine.setProperty('rate', 180)
-        self.engine.setProperty('volume', 1.0)
-        
-        # Seleciona voz em português
-        for voice in self.engine.getProperty('voices'):
-            if 'pt' in voice.languages or 'portuguese' in voice.name.lower():
-                self.engine.setProperty('voice', voice.id)
-                break
-    
-    def ouvir(self):
-        """Ouve o microfone e retorna texto reconhecido"""
-        with sr.Microphone() as source:
-            print("\n🎤 Fale agora (diga 'parar' para interromper)...")
-            self.recognizer.adjust_for_ambient_noise(source, duration=1)
-            try:
-                audio = self.recognizer.listen(source, timeout=5, phrase_time_limit=10)
-                texto = self.recognizer.recognize_google(audio, language='pt-BR')
-                
-                if 'parar' in texto.lower():
-                    self.interromper_fala = True
-                    return None
-                    
-                print(f"Você disse: {texto}")
-                return texto
-            except sr.WaitTimeoutError:
-                return None
-            except Exception as e:
-                print(f"Erro: {e}")
-                return None
-    
-    def falar(self, texto):
-        """Fala o texto com possibilidade de interrupção"""
-        self.interromper_fala = False
-        
-        # Divide texto longo em partes
-        partes = [texto[i:i+200] for i in range(0, len(texto), 200)]
-        
-        for parte in partes:
-            if self.interromper_fala:
-                print("(Fala interrompida)")
-                return
-                
-            print(f"Assistente: {parte}")
-            self.engine.say(parte)
-            self.engine.runAndWait()
-            time.sleep(0.1)
+SQLite: Banco de dados relacional para armazenar dados de usuários, conversas e memórias.
 
-    def iniciar(self):
-        """Loop principal do assistente"""
-        print("Assistente ativado. Diga 'sair' para encerrar.")
-        
-        while True:
-            comando = self.ouvir()
-            
-            if comando:
-                if "sair" in comando.lower():
-                    self.falar("Até logo!")
-                    break
-                
-                resposta = f"Você disse: {comando}"
-                self.falar(resposta)
+🚀 Como Executar o Projeto
+Para rodar o projeto em sua máquina local, siga os passos abaixo.
 
-if __name__ == "__main__":
-    assistente = AssistenteVoz()
-    assistente.iniciar()
-```
+Pré-requisitos
+Node.js (versão 18 ou superior)
 
-## Funcionalidades Principais
+Python (versão 3.10 ou superior)
 
-1. **Reconhecimento de Voz**:
-   - Captura áudio do microfone
-   - Converte fala em texto usando a API do Google
-   - Suporte ao idioma português do Brasil
-   - Filtro de ruído ambiente
+Ollama instalado e com o modelo gemma3n baixado (ollama pull gemma3n).
 
-2. **Síntese de Voz**:
-   - Conversão de texto para fala offline
-   - Ajuste de velocidade e volume
-   - Suporte a interrupção durante a fala
-   - Divisão automática de textos longos
+1. Back-End
+Bash
 
-3. **Controles por Voz**:
-   - Comando "parar" para interromper a fala atual
-   - Comando "sair" para encerrar o programa
+# 1. Clone o repositório
+git clone <URL_DO_SEU_REPOSITORIO>
 
-## Configuração Recomendada
+# 2. Navegue até a pasta do back-end
+cd LyrIA-279c132dc1e8fa9840e3c120c6c09ec38c535368/backEnd
 
-1. **Microfone**:
-   - Use um microfone de boa qualidade
-   - Evite ambientes muito ruidosos
+# 3. Crie um ambiente virtual (recomendado)
+python -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
 
-2. **Alto-falantes**:
-   - Configure o volume do sistema adequadamente
-   - Teste a qualidade da saída de áudio
+# 4. Instale as dependências
+pip install -r requirements.txt
 
-3. **Otimizações**:
-   - Ajuste `recognizer.adjust_for_ambient_noise()` conforme o ambiente
-   - Modifique `engine.setProperty('rate')` para velocidade preferida
+# 5. Crie o banco de dados
+python banco/banco.py
 
-## Possíveis Erros e Soluções
+# 6. Inicie o servidor Flask
+flask run --port 5000
+2. Front-End
+Bash
 
-1. **Microfone não detectado**:
-   - Verifique as configurações de áudio do Windows
-   - Conecte o microfone antes de iniciar o programa
+# 1. Em um novo terminal, navegue até a pasta do front-end
+cd ../lyria-web
 
-2. **Voz em inglês**:
-   - Instale pacotes de voz em português no Windows
-   - Verifique se há vozes em português disponíveis:
-     ```python
-     print(engine.getProperty('voices'))
-     ```
+# 2. Instale as dependências
+npm install
 
-3. **Erros de instalação**:
-   - Para problemas com PyAudio, use:
-     ```bash
-     pip install pipwin
-     pipwin install pyaudio
-     ```
+# 3. Inicie a aplicação React
+npm run dev
+Após seguir os passos, acesse http://localhost:5173 (ou a porta indicada no terminal) no seu navegador.
 
-Este sistema fornece uma base completa para implementação de assistentes virtuais com controle por voz em Python, podendo ser facilmente integrado a outras funcionalidades.
+👥 Equipe
+Este projeto foi desenvolvido com muito carinho e dedicação pela seguinte equipe de estudantes do SENAI São Carlos:
+
+Antony
+
+Gabriel Cardoso
+
+João Gabriel
+
+Juliana
+
+Raissa
+
+Vitoria
