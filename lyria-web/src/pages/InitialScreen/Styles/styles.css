@@ -127,12 +127,13 @@
 }
 
 
-#frase_efeito {
+.blur {
   text-align: center;
   align-items: center;
   color: white;
   margin-top: 5%;
   font-size: 40px;
+  font-weight: bold;
 }
 
 /* --- ESTILOS PARA O MODAL DE INFORMAÇÕES --- */

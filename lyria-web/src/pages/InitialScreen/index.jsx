@@ -3,6 +3,8 @@ import './Styles/styles.css';
 import { Link } from 'react-router-dom';
 import Galaxy from '../../components/Galaxy/Galaxy.jsx';
 import { FaTimes } from "react-icons/fa"; // Ícone para o botão de fechar
+import BlurText from "../../components/BlurText/BlurText.jsx";
+
 
 function InitialScreen() {
   // Estado para controlar a visibilidade do modal de informações
@@ -11,7 +13,13 @@ function InitialScreen() {
   // Função para mostrar ou esconder o modal
   const toggleInfoModal = () => {
     setInfoVisible(!isInfoVisible);
-  };
+
+    };
+
+    const handleAnimationComplete = () => {
+  console.log('Animation completed!');
+};
+  
 
   return (
     <div className="App">
@@ -34,16 +42,23 @@ function InitialScreen() {
           mouseRepulsion={false}
           mouseInteraction={false}
           density={1}
-          glowIntensity={0.55}
+          glowIntensity={0.4}
           saturation={0.6}
           hueShift={210}
         />
       </div>
 
       <div className="main-content">
-        <div id="frase_efeito">
-          <b>Conheça LyrIA</b>
-        </div>
+
+  <BlurText 
+  text= "Conheça LyrIA"
+  delay={150}
+  animateBy="words"
+  direction="top"
+  onAnimationComplete={handleAnimationComplete}
+  className="blur"
+/>
+     
         <span id="espaço"></span>
         <div className="container_espaço">
           <Link className="linkSemEstilo" to={'/chat'}>
