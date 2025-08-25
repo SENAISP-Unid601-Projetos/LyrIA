@@ -30,19 +30,14 @@ recognizer.energy_threshold = 400
 recognizer.pause_threshold = 0.8
 
 def carregar_memorias(usuario):
-    """
-    Carrega memórias do usuário (importa da banco.banco)
-    """
     from banco.banco import carregar_memorias as carregar_memorias_db
     return carregar_memorias_db(usuario)
 
 def falar(texto):
-    """Converte texto em fala"""
     engine.say(texto)
     engine.runAndWait()
 
 def ouvir_microfone():
-    """Captura áudio do microfone e converte para texto"""
     with sr.Microphone() as source:
         print("\nAguardando ativação... (diga 'Lyria' ou 'Olá')")
         recognizer.adjust_for_ambient_noise(source, duration=1)
@@ -70,9 +65,7 @@ def ouvir_microfone():
             print(f"Erro áudio: {e}")
             return ""
 
-def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
-    """Envia pergunta para o modelo Ollama com otimizações"""
-    
+def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):    
     LIMITE_HISTORICO_REDUZIDO = 6
     
     prompt_parts = [persona]
@@ -144,7 +137,6 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
         return "Erro interno. Tente novamente em alguns instantes."
 
 def verificar_ollama_status():
-    """Verifica se o Ollama está rodando e respondendo"""
     try:
         response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=5)
         if response.status_code == 200:
@@ -164,7 +156,6 @@ def verificar_ollama_status():
         return {'status': 'erro', 'detalhes': str(e)}
 
 def buscar_na_web(pergunta):
-    """Busca informações na web usando SerpAPI"""
     try:
         params = {"q": pergunta, "hl": "pt-br", "gl": "br", "api_key": SERPAPI_KEY}
         res = requests.get("https://serpapi.com/search", params=params, timeout=10)
@@ -179,10 +170,10 @@ def buscar_na_web(pergunta):
         return None
 
 def get_persona_texto(persona_tipo):
-    """Retorna o texto completo da persona baseado no tipo"""
     personas = {
         'professor': "Você é a professora Lyria, responda de forma didática e empática. Ajude o usuário a aprender de forma clara e motivadora.",
-        'empresarial': "Você é a assistente Lyria, responda de forma profissional e objetiva. Foque em soluções práticas e eficiência."
+        'empresarial': "Você é a assistente Lyria, responda de forma profissional e objetiva. Foque em soluções práticas e eficiência.",
+        'social': "Você é a amiga Lyria, responda de forma empática, sempre tentando ajudar a pessoa de acordo com o seu contexto social"
     }
     return personas.get(persona_tipo, personas['professor'])
 
@@ -251,7 +242,6 @@ if __name__ == "__main__":
             elif not entrada:
                 continue
                 
-            # Busca contexto web se necessário
             contexto_web = None
             if deve_buscar_na_web(entrada):
                 contexto_web = buscar_na_web(entrada)

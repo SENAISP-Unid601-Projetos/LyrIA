@@ -19,6 +19,23 @@ criar_banco()
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/Lyria/conversar', methods=['POST'])
+def conversarSemConta():
+    data = request.get_json()
+    if not data or 'pergunta' not in data:
+        return jsonify({"erro": "Campo 'pergunta' é obrigatório"}), 400
+    pergunta = data['pergunta']
+    
+    try:
+        contexto_web = None
+        if deve_buscar_na_web(pergunta):
+            contexto_web = buscar_na_web(pergunta)
+        resposta = perguntar_ollama(pergunta, None, None, 'professor', contexto_web)
+        return jsonify({"resposta": resposta})
+        
+    except Exception as e:
+        return jsonify({"erro": f"Erro interno: {str(e)}"}), 500
+
 @app.route('/Lyria/<usuario>/conversar', methods=['POST'])
 def conversar(usuario):
     data = request.get_json()
