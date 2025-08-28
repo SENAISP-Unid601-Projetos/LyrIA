@@ -1,38 +1,29 @@
-import { useState } from 'react'; // Importa o useState
+import { useState } from 'react';
 import './Styles/styles.css';
 import { Link } from 'react-router-dom';
 import Galaxy from '../../components/Galaxy/Galaxy.jsx';
-import { FaTimes } from "react-icons/fa"; // Ícone para o botão de fechar
-import BlurText from "../../components/BlurText/BlurText.jsx";
-
+import { FaTimes } from "react-icons/fa";
+import logoImage from '/img/LogoBranca.png';
 
 function InitialScreen() {
-  // Estado para controlar a visibilidade do modal de informações
   const [isInfoVisible, setInfoVisible] = useState(false);
 
-  // Função para mostrar ou esconder o modal
   const toggleInfoModal = () => {
     setInfoVisible(!isInfoVisible);
-
-    };
-
-    const handleAnimationComplete = () => {
-  console.log('Animation completed!');
-};
-  
+  };
 
   return (
     <div className="App">
       <header className="app-header">
-        <Link to={'/'}>
-        <div className="logo">
-          <b>LYRIA</b>
-        </div>
+        <Link to={'/'} className="logo-link">
+          <div className="logo">
+            {/* CÓDIGO CORRIGIDO: */}
+            <img src={logoImage} alt="Logo da LyrIA" className="logo-image" />
+          </div>
         </Link>
         <nav>
-          <Link to={'/RegistrationAndLogin'}>
-          <p>Entrar</p>
-          </Link>
+          {/* Mudei o <p> para <a> para manter a consistência do estilo */}
+          <Link to={'/RegistrationAndLogin'}>Entrar</Link>
           <a href="#">Contato</a>
         </nav>
       </header>
@@ -42,38 +33,29 @@ function InitialScreen() {
           mouseRepulsion={false}
           mouseInteraction={false}
           density={1}
-          glowIntensity={0.4}
+          glowIntensity={0.55}
           saturation={0.6}
           hueShift={210}
         />
       </div>
 
       <div className="main-content">
-
-  <BlurText 
-  text= "Conheça LyrIA"
-  delay={150}
-  animateBy="words"
-  direction="top"
-  onAnimationComplete={handleAnimationComplete}
-  className="blur"
-/>
-     
+        <div id="frase_efeito">
+          <b>Conheça LyrIA</b>
+        </div>
         <span id="espaço"></span>
         <div className="container_espaço">
           <Link className="linkSemEstilo" to={'/chat'}>
-          <button id="comecar">
-            Começar
-          </button>
+            <button id="comecar">
+              Começar
+            </button>
           </Link>
-          {/* Botão "Saiba Mais" agora abre o modal */}
           <button id="sobre" onClick={toggleInfoModal}>
             Saiba Mais
           </button>
         </div>
       </div>
 
-      {/* Modal de informações que aparece condicionalmente */}
       {isInfoVisible && (
         <div className="info-modal-backdrop">
           <div className="info-modal-content">
