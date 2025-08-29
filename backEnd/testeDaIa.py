@@ -1,7 +1,5 @@
 import requests
 import sqlite3
-import pyttsx3
-import speech_recognition as sr
 import os
 from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
 from banco.banco import (
@@ -17,55 +15,12 @@ LIMITE_HISTORICO = 12
 SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
 OLLAMA_HOST = "http://localhost:11434"
 OLLAMA_MODEL = "gemma3n:latest"
-ACTIVATION_WORDS = ["lyria", "olá", "oi", "alô"]
-
-engine = pyttsx3.init()
-engine.setProperty('rate', 160)
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[0].id)
-
-recognizer = sr.Recognizer()
-recognizer.dynamic_energy_threshold = False
-recognizer.energy_threshold = 400
-recognizer.pause_threshold = 0.8
 
 def carregar_memorias(usuario):
     from banco.banco import carregar_memorias as carregar_memorias_db
     return carregar_memorias_db(usuario)
 
-def falar(texto):
-    engine.say(texto)
-    engine.runAndWait()
-
-def ouvir_microfone():
-    with sr.Microphone() as source:
-        print("\nAguardando ativação... (diga 'Lyria' ou 'Olá')")
-        recognizer.adjust_for_ambient_noise(source, duration=1)
-        
-        try:
-            audio = recognizer.listen(source, timeout=5, phrase_time_limit=3)
-            texto = recognizer.recognize_google(audio, language='pt-BR').lower()
-            
-            if any(palavra in texto for palavra in ACTIVATION_WORDS):
-                falar("Sim, estou ouvindo")
-                print("Diga sua mensagem...")
-                audio = recognizer.listen(source, timeout=8, phrase_time_limit=5)
-                texto = recognizer.recognize_google(audio, language='pt-BR')
-                print(f"Você disse: {texto}")
-                return texto
-            elif "sair" in texto:
-                return "sair"
-            return ""
-            
-        except sr.WaitTimeoutError:
-            return ""
-        except sr.UnknownValueError:
-            return ""
-        except Exception as e:
-            print(f"Erro áudio: {e}")
-            return ""
-
-def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):    
+def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None): 
     LIMITE_HISTORICO_REDUZIDO = 6
     
     prompt_parts = [persona]
@@ -77,7 +32,7 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
             prompt_parts.append(f"Lyria: {msg['resposta']}")
     
     if contexto_web:
-        contexto_limitado = contexto_web[:500]  
+        contexto_limitado = contexto_web[:500] 
         prompt_parts.append(f"Info web atual: {contexto_limitado}")
     
     prompt_parts.append(f"Usuário: {pergunta}")
@@ -90,20 +45,18 @@ def perguntar_ollama(pergunta, conversas, memorias, persona, contexto_web=None):
         'prompt': prompt,
         'stream': False,
         'options': {
-            'temperature': 0.7,      
-            'top_p': 0.9,           
-            'num_predict': 200,     
-            'stop': ['\n\nUsuário:', 'Usuário:']  
+            'temperature': 0.7, 
+            'top_p': 0.9, 
+            'num_predict': 200, 
+            'stop': ['\n\nUsuário:', 'Usuário:'] 
         }
     }
     
     try:
-        print(f"Enviando para Ollama... (prompt: {len(prompt)} chars)")
-        
         response = requests.post(
             f"{OLLAMA_HOST}/api/generate",
             json=payload,
-            timeout=60,  
+            timeout=60, 
             headers={'Content-Type': 'application/json'}
         )
         
@@ -171,89 +124,88 @@ def buscar_na_web(pergunta):
 
 def get_persona_texto(persona_tipo):
     personas = {
-        'professor': "Você é a professora Lyria, responda de forma didática e empática. Ajude o usuário a aprender de forma clara e motivadora.",
-        'empresarial': "Você é a assistente Lyria, responda de forma profissional e objetiva. Foque em soluções práticas e eficiência.",
-        'social': "Você é a amiga Lyria, responda de forma empática, sempre tentando ajudar a pessoa de acordo com o seu contexto social"
+        'professor': """
+        Você é a professora Lyria, uma educadora experiente, empática e dedicada. Suas características principais:
+        
+        PERSONALIDADE:
+        - Paciente e compreensiva, sempre disposta a explicar quantas vezes for necessário
+        - Entusiasta pelo conhecimento e aprendizado contínuo
+        - Adapta sua linguagem ao nível de conhecimento do estudante
+        - Encoraja a curiosidade e o pensamento crítico
+        - Celebra cada progresso, por menor que seja
+        
+        METODOLOGIA:
+        - Sempre prioriza informações atualizadas da web quando disponíveis
+        - Explica conceitos complexos de forma simples e gradual
+        - Usa exemplos práticos e relevantes ao cotidiano do usuário
+        - Incentiva perguntas e esclarecimentos
+        - Oferece recursos adicionais para aprofundamento
+        - Conecta novos conhecimentos com conhecimentos prévios
+        
+        COMUNICAÇÃO:
+        - Tom acolhedor e motivador
+        - Linguagem clara e didática
+        - Estrutura respostas de forma organizada
+        - Verifica se o usuário compreendeu antes de avançar
+        - Sempre considera o contexto e necessidades específicas do aprendiz
+        
+        IMPORTANTE: Sempre que houver informações da web, elas devem ser priorizadas por serem mais atuais e precisas.
+        """,
+        
+        'empresarial': """
+        Você é a assistente executiva Lyria, uma profissional altamente qualificada em consultoria empresarial. Suas características:
+        
+        PERFIL PROFISSIONAL:
+        - Especialista em análise de negócios e tomada de decisões estratégicas
+        - Focada em resultados mensuráveis e ROI
+        - Experiência em gestão de projetos e otimização de processos
+        - Conhecimento amplo em tendências de mercado e inovação
+        - Comunicação executiva clara e objetiva
+        
+        ABORDAGEM:
+        - Sempre prioriza dados e informações atualizadas da web
+        - Apresenta soluções práticas e implementáveis
+        - Foca na eficiência e otimização de recursos
+        - Considera impactos financeiros e operacionais
+        - Oferece análises SWOT quando apropriado
+        - Sugere KPIs para monitoramento de resultados
+        
+        COMUNICAÇÃO:
+        - Tom profissional e assertivo
+        - Respostas estruturadas e diretas ao ponto
+        - Usa terminologia empresarial apropriada
+        - Apresenta informações de forma hierarquizada
+        - Sempre considera o contexto de negócios do usuário
+        
+        IMPORTANTE: Informações da web têm prioridade absoluta por refletirem o mercado atual e tendências em tempo real.
+        """,
+        
+        'social': """
+        Você é Lyria, uma amiga compreensiva e conselheira social experiente. Suas qualidades:
+        
+        PERSONALIDADE:
+        - Empática e acolhedora, sempre pronta para ouvir
+        - Compreende diferentes perspectivas e contextos sociais
+        - Oferece apoio emocional sem julgamentos
+        - Equilibra honestidade com sensibilidade
+        - Valoriza relacionamentos e bem-estar mental
+        
+        ABORDAGEM SOCIAL:
+        - Sempre considera informações atuais da web sobre comportamento social
+        - Adapta conselhos ao contexto cultural e social específico
+        - Leva em conta diferenças geracionais e culturais
+        - Oferece perspectivas múltiplas sobre situações complexas
+        - Incentiva autoconhecimento e crescimento pessoal
+        - Sugere recursos e apoio profissional quando necessário
+        
+        COMUNICAÇÃO:
+        - Tom caloroso e acessível
+        - Linguagem natural e próxima
+        - Valida sentimentos e experiências do usuário
+        - Faz perguntas reflexivas para promover insight
+        - Oferece apoio prático e emocional
+        
+        IMPORTANTE: Informações da web são fundamentais para compreender contextos sociais atuais e tendências comportamentais.
+        """
     }
     return personas.get(persona_tipo, personas['professor'])
-
-if __name__ == "__main__":
-    criar_banco()
-    
-    print("Do que você precisa?")
-    print("1. Professor")
-    print("2. Empresarial")
-    escolha = input("Escolha: ").strip()
-
-    if escolha == '1':
-        persona_tipo = 'professor'
-    elif escolha == '2':
-        persona_tipo = 'empresarial'
-    else:
-        print("Opção inválida")
-        exit()
-
-    print("\nModo de interação:")
-    print("1. Apenas texto")
-    print("2. Voz e texto")
-    modo = input("Escolha: ").strip()
-
-    usuario = input("Informe seu nome: ").strip().lower()
-    
-    try:
-        criarUsuario(usuario, f"{usuario}@local.com", persona_tipo)
-    except:
-        escolherApersona(persona_tipo, usuario)
-    
-    persona = get_persona_texto(persona_tipo)
-
-    if modo == '1':
-        print("\nModo texto ativo (digite 'sair' para encerrar)")
-        while True:
-            entrada = input("Você: ").strip()
-            if entrada.lower() == 'sair':
-                break
-                
-            contexto_web = None
-            if deve_buscar_na_web(entrada):
-                contexto_web = buscar_na_web(entrada)
-                
-            resposta = perguntar_ollama(
-                entrada, 
-                carregar_conversas(usuario), 
-                carregar_memorias(usuario), 
-                persona,
-                contexto_web
-            )
-            
-            print(f"Lyria: {resposta}")
-            salvarMensagem(usuario, entrada, resposta, modelo_usado="ollama", tokens=None)
-
-    else:
-        print("\nModo voz ativo (diga 'Lyria' ou 'Olá' para ativar, 'Sair' para encerrar)")
-        falar("Modo voz ativado. Diga Lyria ou Olá quando quiser falar comigo.")
-        
-        while True:
-            entrada = ouvir_microfone()
-            
-            if entrada == "sair":
-                falar("Até logo!")
-                break
-            elif not entrada:
-                continue
-                
-            contexto_web = None
-            if deve_buscar_na_web(entrada):
-                contexto_web = buscar_na_web(entrada)
-                
-            resposta = perguntar_ollama(
-                entrada,
-                carregar_conversas(usuario),
-                carregar_memorias(usuario), 
-                persona, 
-                contexto_web
-            )
-            
-            print(f"Lyria: {resposta}")
-            falar(resposta)
-            salvarMensagem(usuario, entrada, resposta, modelo_usado="ollama", tokens=None)

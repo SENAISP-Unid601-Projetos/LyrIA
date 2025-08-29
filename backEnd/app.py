@@ -13,8 +13,7 @@ from banco.banco import (
     carregar_memorias
 )
 from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
-
-criar_banco()
+from waitress import serve
 
 app = Flask(__name__)
 CORS(app)
@@ -134,7 +133,7 @@ def get_usuario(usuarioEmail):
 def get_historico_recente(usuario):
     try:
         limite = request.args.get('limite', 10, type=int)
-        if limite > 50:  
+        if limite > 50: 
             limite = 50
             
         historico = pegarHistorico(usuario, limite)
@@ -151,4 +150,7 @@ def listar_personas():
     return jsonify({"personas": personas})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    criar_banco()
+    
+    print("Iniciando servidor de produção com Waitress...")
+    serve(app, host='0.0.0.0', port=5000)
