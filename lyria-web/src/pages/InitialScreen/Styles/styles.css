@@ -25,18 +25,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 30px;
+  height: 65px;
+  padding: 0 30px;
+  transition: all 0.3s ease; /* Adicionado para suavizar a transição */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  height: 90%;
 }
 
 .app-header .logo {
-  font-size: 15px;
-  font-weight: 2500;
-  color: white;
-  padding: 15px
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.logo-image {
+  height: 60%;
+  width: auto;
+  transition: height 0.3s ease; /* Adicionado para suavizar a transição */
 }
 
 .app-header nav {
   display: flex;
+  align-items: center;
   gap: 30px;
 }
 
@@ -77,6 +92,7 @@
   font-size: 1.2rem;
   font-weight: 500;
   color: rgb(0, 0, 0);
+  background-color: white;
   letter-spacing: 0.5px;
   padding: 20px 70px;
   border-radius: 50px;
@@ -86,6 +102,12 @@
   transition: all 0.3s ease;
 }
 
+#comecar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+  background-color: #f0f0f0;
+}
+
 .linkSemEstilo {
   text-decoration: none;
   color: inherit;
@@ -93,11 +115,6 @@
 
 #espaço {
   padding: 5px;
-}
-
-#comecar:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 #sobre {
@@ -113,10 +130,9 @@
   background-color: rgba(32, 32, 32, 0.731);
   padding: 20px 59px;
   border-radius: 50px;
-  border-color: rgb(75, 75, 75);
-  border-width: 1.8px;
-  cursor: pointer; /* Adicionado cursor pointer */
-  transition: all 0.3s ease; /* Adicionado transição */
+  border: 1.8px solid rgb(75, 75, 75);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 #sobre:hover {
@@ -127,16 +143,13 @@
 }
 
 
-.blur {
+#frase_efeito {
   text-align: center;
   align-items: center;
   color: white;
   margin-top: 5%;
   font-size: 40px;
-  font-weight: bold;
 }
-
-/* --- ESTILOS PARA O MODAL DE INFORMAÇÕES --- */
 
 .info-modal-backdrop {
   position: fixed;
@@ -144,7 +157,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: lab(0% 0 0 / 0.623); /* Fundo escuro semi-transparente */
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   display: flex;
@@ -160,10 +173,9 @@
   max-width: 600px;
   padding: 2.5rem;
   color: white;
-  text-align: left; /* Alinhamento do texto à esquerda para melhor leitura */
+  text-align: left;
   
-  /* Efeito Glassmorphism */
-  background: rgba(22, 8, 40, 0.548);
+  background: rgba(13, 15, 47, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1.5px solid rgba(201, 182, 242, 0.2);
@@ -176,7 +188,7 @@
 .info-modal-content h2 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
-  color: white
+  color: var(--color-light-purple);
 }
 
 .info-modal-content h3 {
@@ -220,7 +232,6 @@
   transform: rotate(90deg);
 }
 
-/* Animações */
 @keyframes fadeInBackdrop {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -237,10 +248,13 @@
   }
 }
 
+/* --- REGRAS DE RESPONSIVIDADE ADICIONADAS --- */
 
+/* Para tablets e telas menores */
 @media (max-width: 992px) {
-  .App {
-    justify-content: center;
+  .app-header {
+    width: 90%; /* Ocupa mais espaço na largura */
+    top: 20px;   /* Sobe um pouco */
   }
 
   .main-content {
@@ -251,5 +265,43 @@
 
   #frase_efeito {
     font-size: 32px;
+  }
+}
+
+/* Para celulares */
+@media (max-width: 768px) {
+  .app-header {
+    height: 60px; /* Diminui a altura */
+    padding: 0 20px; /* Diminui o espaçamento interno */
+  }
+
+  .logo-image {
+    height: 50%; /* Diminui o tamanho da logo */
+  }
+
+  .app-header nav {
+    gap: 20px; /* Diminui o espaço entre os links de navegação */
+  }
+
+  #frase_efeito {
+    font-size: 28px;
+  }
+
+  #comecar, #sobre {
+    font-size: 1rem; /* Diminui o tamanho da fonte nos botões */
+    padding: 18px 40px; /* Ajusta o padding dos botões */
+  }
+}
+
+/* Para celulares bem pequenos */
+@media (max-width: 480px) {
+  .app-header nav a {
+    font-size: 0.9rem; /* Diminui ainda mais a fonte da navegação */
+  }
+
+  /* Esconde o texto da logo, deixando só a imagem se necessário,
+     ou apenas reduz mais o tamanho. Por enquanto, vamos só reduzir. */
+  .logo-image {
+    height: 45%;
   }
 }

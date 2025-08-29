@@ -1,40 +1,27 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; // Importe o useNavigate
-import Galaxy from "../../components/Galaxy/Galaxy";
+import { useNavigate } from "react-router-dom";
+// import Galaxy from "../../components/Galaxy/Galaxy"; // <--- REMOVIDO
 import "./Styles/styles.css";
 
 function LoginRegisterPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const navigate = useNavigate(); // Crie a função de navegação
+  const navigate = useNavigate();
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
   };
 
-  // Função para lidar com o envio do formulário
   const handleAuth = (event) => {
-    event.preventDefault(); // Previne o recarregamento da página
-    // Aqui você adicionaria sua lógica de autenticação (chamar API, etc.)
-    // Após a autenticação bem-sucedida, navegue para a página inicial
+    event.preventDefault();
     navigate("/");
   };
 
   return (
     <div className="auth-body">
-      <div className="galaxy-background">
-        <Galaxy
-          density={0.8}
-          glowIntensity={0.4}
-          saturation={0.8}  
-          hueShift={220}
-          starSpeed={0.3}
-          mouseRepulsion={false}
-          repulsionStrength={1.5}
-        />
-      </div>
+      {/* O <Galaxy /> foi removido daqui porque o GalaxyLayout já o fornece */}
 
       <div className={`form-container ${isLogin ? "login-active" : "register-active"}`}>
         <div className="form-content">
@@ -45,7 +32,6 @@ function LoginRegisterPage() {
               : "Junte-se a nós e explore o universo LyrIA."}
           </p>
 
-          {/* Adicionado o onSubmit para chamar a função handleAuth */}
           <form onSubmit={handleAuth}>
             {!isLogin && (
               <div className="input-group">
