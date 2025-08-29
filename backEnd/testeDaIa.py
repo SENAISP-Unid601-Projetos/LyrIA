@@ -14,8 +14,8 @@ from banco.banco import (
 )
 
 LIMITE_HISTORICO = 12
-SERPAPI_KEY = "11480a6923b283bdc1a34c6243b975f4664be3aaab350aecc4da71bc6af80f62"
-OLLAMA_HOST = "http://localhost:11434"
+SERPAPI_KEY = os.getenv("KEY_SERP_API")
+OLLAMA_HOST = os.getenv("HOST_OLLAMA")
 OLLAMA_MODEL = "gemma3n:latest"
 
 def carregar_memorias(usuario):
