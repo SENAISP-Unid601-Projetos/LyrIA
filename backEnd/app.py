@@ -155,5 +155,4 @@ if __name__ == '__main__':
     print("Passo 2: Banco de dados criado com sucesso. Agora, vou iniciar o servidor.")
     
     print("Passo 3: Iniciando servidor de produção com Waitress...")
-    serve(app, host='0.0.0.0', port=5000)
-    print("Passo 4: Servidor iniciado. Você não deveria ver esta mensagem.")
+    serve(app, host='0.0.0.0', port=5001)
