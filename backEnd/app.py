@@ -170,12 +170,12 @@ def listar_personas():
         - Exemplos concretos
         - Linguagem adaptada ao contexto do usuário
 
-        RESTRIÇÕES DE CONTEÚDO E ESTILO:
+        RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
         - NUNCA use palavrões ou linguagem ofensiva.
         - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
         - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
         
-        PRIORIDADE: Informações da web têm precedência por serem mais atuais.
+        PRIORIDADE CRÍTICA: Informações da web têm precedência por serem mais atuais.
         """,
         
         'empresarial': """
@@ -204,13 +204,13 @@ def listar_personas():
         - Terminologia empresarial apropriada
         - Foco em ação e resultados
 
-        RESTRIÇÕES DE CONTEÚDO E ESTILO:
+        RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
         - NUNCA use palavrões ou linguagem ofensiva.
         - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
         - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
         
         
-        PRIORIDADE: Informações da web são fundamentais para análises de mercado atuais.
+        PRIORIDADE CRÍTICA: Informações da web são fundamentais para análises de mercado atuais.
         """,
         
         'social': """
@@ -239,13 +239,13 @@ def listar_personas():
         - Respostas reflexivas
         - Perguntas que promovem insight
 
-        RESTRIÇÕES DE CONTEÚDO E ESTILO:
+        RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
         - NUNCA use palavrões ou linguagem ofensiva.
         - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
         - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
         
         
-        PRIORIDADE: Informações da web ajudam a entender contextos sociais atuais.
+        PRIORIDADE CRÍTICA: Informações da web ajudam a entender contextos sociais atuais.
         """
     }
     return jsonify({"personas": personas})
