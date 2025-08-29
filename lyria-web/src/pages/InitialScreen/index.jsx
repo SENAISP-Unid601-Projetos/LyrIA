@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './Styles/styles.css';
 import { Link } from 'react-router-dom';
-import Galaxy from '../../components/Galaxy/Galaxy.jsx';
+// import Galaxy from '../../components/Galaxy/Galaxy.jsx'; // <--- REMOVIDO
 import { FaTimes } from "react-icons/fa";
 import logoImage from '/img/LogoBranca.png';
 
@@ -17,27 +17,16 @@ function InitialScreen() {
       <header className="app-header">
         <Link to={'/'} className="logo-link">
           <div className="logo">
-            {/* CÓDIGO CORRIGIDO: */}
             <img src={logoImage} alt="Logo da LyrIA" className="logo-image" />
           </div>
         </Link>
         <nav>
-          {/* Mudei o <p> para <a> para manter a consistência do estilo */}
           <Link to={'/RegistrationAndLogin'}>Entrar</Link>
           <a href="#">Contato</a>
         </nav>
       </header>
 
-      <div className="galaxy-background">
-        <Galaxy
-          mouseRepulsion={false}
-          mouseInteraction={false}
-          density={1}
-          glowIntensity={0.55}
-          saturation={0.6}
-          hueShift={210}
-        />
-      </div>
+      {/* O <Galaxy /> foi removido daqui porque o GalaxyLayout já o fornece */}
 
       <div className="main-content">
         <div id="frase_efeito">
@@ -45,7 +34,7 @@ function InitialScreen() {
         </div>
         <span id="espaço"></span>
         <div className="container_espaço">
-          <Link className="linkSemEstilo" to={'/chat'}>
+          <Link className="linkSemEstilo" to={'/loading'}>
             <button id="comecar">
               Começar
             </button>

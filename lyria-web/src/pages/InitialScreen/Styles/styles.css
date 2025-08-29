@@ -25,29 +25,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
-  /* --- AJUSTE PRINCIPAL AQUI --- */
-  height: 65px; /* Define uma altura fixa para o header */
-  padding: 0 30px; /* Remove o padding vertical e mantém o horizontal */
+  height: 65px;
+  padding: 0 30px;
+  transition: all 0.3s ease; /* Adicionado para suavizar a transição */
 }
 
 .logo-link {
   display: flex;
   align-items: center;
-  height: 100%; /* Faz o link ocupar toda a altura do header */
+  height: 90%;
 }
 
 .app-header .logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%; /* O container da logo agora é flexível */
+  height: 100%;
 }
 
 .logo-image {
-  /* A imagem se ajusta à altura do container, ignorando margens internas */
-  height: 80%; /* Usamos um percentual para criar um respiro visual */
+  height: 60%;
   width: auto;
+  transition: height 0.3s ease; /* Adicionado para suavizar a transição */
 }
 
 .app-header nav {
@@ -249,10 +248,13 @@
   }
 }
 
+/* --- REGRAS DE RESPONSIVIDADE ADICIONADAS --- */
 
+/* Para tablets e telas menores */
 @media (max-width: 992px) {
-  .App {
-    justify-content: center;
+  .app-header {
+    width: 90%; /* Ocupa mais espaço na largura */
+    top: 20px;   /* Sobe um pouco */
   }
 
   .main-content {
@@ -263,5 +265,43 @@
 
   #frase_efeito {
     font-size: 32px;
+  }
+}
+
+/* Para celulares */
+@media (max-width: 768px) {
+  .app-header {
+    height: 60px; /* Diminui a altura */
+    padding: 0 20px; /* Diminui o espaçamento interno */
+  }
+
+  .logo-image {
+    height: 50%; /* Diminui o tamanho da logo */
+  }
+
+  .app-header nav {
+    gap: 20px; /* Diminui o espaço entre os links de navegação */
+  }
+
+  #frase_efeito {
+    font-size: 28px;
+  }
+
+  #comecar, #sobre {
+    font-size: 1rem; /* Diminui o tamanho da fonte nos botões */
+    padding: 18px 40px; /* Ajusta o padding dos botões */
+  }
+}
+
+/* Para celulares bem pequenos */
+@media (max-width: 480px) {
+  .app-header nav a {
+    font-size: 0.9rem; /* Diminui ainda mais a fonte da navegação */
+  }
+
+  /* Esconde o texto da logo, deixando só a imagem se necessário,
+     ou apenas reduz mais o tamanho. Por enquanto, vamos só reduzir. */
+  .logo-image {
+    height: 45%;
   }
 }
