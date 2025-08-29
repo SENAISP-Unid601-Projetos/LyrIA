@@ -1,5 +1,7 @@
 import requests
 import sqlite3
+import pyttsx3
+import speech_recognition as sr
 import os
 from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
 from banco.banco import (
@@ -209,3 +211,49 @@ def get_persona_texto(persona_tipo):
         """
     }
     return personas.get(persona_tipo, personas['professor'])
+
+if __name__ == "__main__":
+    criar_banco()
+    
+    print("Do que você precisa?")
+    print("1. Professor")
+    print("2. Empresarial")
+    escolha = input("Escolha: ").strip()
+
+    if escolha == '1':
+        persona_tipo = 'professor'
+    elif escolha == '2':
+        persona_tipo = 'empresarial'
+    else:
+        print("Opção inválida")
+        exit()
+
+    usuario = input("Informe seu nome: ").strip().lower()
+    
+    try:
+        criarUsuario(usuario, f"{usuario}@local.com", persona_tipo)
+    except:
+        escolherApersona(persona_tipo, usuario)
+    
+    persona = get_persona_texto(persona_tipo)
+    
+    print("\nModo texto ativo (digite 'sair' para encerrar)")
+    while True:
+        entrada = input("Você: ").strip()
+        if entrada.lower() == 'sair':
+            break
+            
+        contexto_web = None
+        if deve_buscar_na_web(entrada):
+            contexto_web = buscar_na_web(entrada)
+            
+        resposta = perguntar_ollama(
+            entrada, 
+            carregar_conversas(usuario), 
+            carregar_memorias(usuario), 
+            persona,
+            contexto_web
+        )
+        
+        print(f"Lyria: {resposta}")
+        salvarMensagem(usuario, entrada, resposta, modelo_usado="ollama", tokens=None)

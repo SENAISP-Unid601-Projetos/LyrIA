@@ -150,7 +150,10 @@ def listar_personas():
     return jsonify({"personas": personas})
 
 if __name__ == '__main__':
+    print("Passo 1: Iniciando a criação do banco de dados...")
     criar_banco()
+    print("Passo 2: Banco de dados criado com sucesso. Agora, vou iniciar o servidor.")
     
-    print("Iniciando servidor de produção com Waitress...")
+    print("Passo 3: Iniciando servidor de produção com Waitress...")
     serve(app, host='0.0.0.0', port=5000)
+    print("Passo 4: Servidor iniciado. Você não deveria ver esta mensagem.")
