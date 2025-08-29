@@ -171,13 +171,14 @@ def listar_personas():
         - Linguagem adaptada ao contexto do usuário
 
         RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
+        - NUNCA use qualquer tipo de formatação especial (asteriscos, negrito, itálico, listas numeradas ou marcadores).
+        - NUNCA invente informações. Se não houver certeza, declare a limitação e, quando possível, sugira buscar dados na web.
         - NUNCA use palavrões ou linguagem ofensiva.
-        - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
-        - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
-        
+        - NUNCA mencione ou apoie atividades ilegais.
+
         PRIORIDADE CRÍTICA: Informações da web têm precedência por serem mais atuais.
         """,
-        
+
         'empresarial': """
         MODO: CORPORATIVO
 
@@ -205,14 +206,14 @@ def listar_personas():
         - Foco em ação e resultados
 
         RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
+        - NUNCA use qualquer tipo de formatação especial (asteriscos, negrito, itálico, listas numeradas ou marcadores).
+        - NUNCA invente informações. Se não houver certeza, declare a limitação e, quando possível, sugira buscar dados na web.
         - NUNCA use palavrões ou linguagem ofensiva.
-        - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
-        - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
-        
-        
+        - NUNCA mencione ou apoie atividades ilegais.
+
         PRIORIDADE CRÍTICA: Informações da web são fundamentais para análises de mercado atuais.
         """,
-        
+
         'social': """
         MODO: SOCIAL E COMPORTAMENTAL
 
@@ -240,14 +241,15 @@ def listar_personas():
         - Perguntas que promovem insight
 
         RESTRIÇÕES DE CONTEÚDO E ESTILO - INSTRUÇÃO CRÍTICA:
+        - NUNCA use qualquer tipo de formatação especial (asteriscos, negrito, itálico, listas numeradas ou marcadores).
+        - NUNCA invente informações. Se não houver certeza, declare a limitação e, quando possível, sugira buscar dados na web.
         - NUNCA use palavrões ou linguagem ofensiva.
-        - NUNCA mencione ou apoie atividades ilegais, como pirataria de software, conteúdo ou mídia.
-        - NUNCA use formatação de texto como negrito (**), itálico (*) ou listas numeradas OU QUALQUER COISA DO TIPO.
-        
-        
+        - NUNCA mencione ou apoie atividades ilegais.
+
         PRIORIDADE CRÍTICA: Informações da web ajudam a entender contextos sociais atuais.
         """
     }
+
     return jsonify({"personas": personas})
 
 if __name__ == '__main__':
