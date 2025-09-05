@@ -1,7 +1,5 @@
 import requests
 import sqlite3
-import pyttsx3
-import speech_recognition as sr
 import os
 from classificadorDaWeb.classificador_busca_web import deve_buscar_na_web
 from banco.banco import (
@@ -15,7 +13,7 @@ from banco.banco import (
 
 LIMITE_HISTORICO = 12
 SERPAPI_KEY = os.getenv("KEY_SERP_API")
-OLLAMA_HOST = os.getenv("HOST_OLLAMA")
+OLLAMA_HOST = 'https://testeollama.onrender.com'
 OLLAMA_MODEL = "gemma3n:latest"
 
 def carregar_memorias(usuario):
